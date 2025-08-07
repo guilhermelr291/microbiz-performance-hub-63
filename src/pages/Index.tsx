@@ -9,6 +9,7 @@ import MenuGoals from '@/components/MenuGoals';
 import { GeneralAnalysis } from '@/components/GeneralAnalysis';
 import { DashboardCards } from '@/components/DashboardCards';
 import CustomersList from '@/components/CustomersList';
+import SalesList from '@/components/SalesList';
 import { Period, DateRange } from '@/types/metrics';
 
 // Helper function to get previous month's equivalent date range
@@ -157,6 +158,10 @@ const Index = () => {
 
           <TabsContent value="clientes" className="space-y-6">
             <CustomersList />
+          </TabsContent>
+
+          <TabsContent value="vendas" className="space-y-6">
+            <SalesList />
           </TabsContent>
 
           <TabsContent value="marketing" className="space-y-6">
