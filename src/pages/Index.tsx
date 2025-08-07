@@ -5,7 +5,6 @@ import NewDashboardLayout from '@/components/NewDashboardLayout';
 import SalesOverview from '@/components/SalesOverview';
 import CustomerMetrics from '@/components/CustomerMetrics';
 import MarketingPerformance from '@/components/MarketingPerformance';
-import MetricsHeader from '@/components/MetricsHeader';
 import MenuGoals from '@/components/MenuGoals';
 import { GeneralAnalysis } from '@/components/GeneralAnalysis';
 import { DashboardCards } from '@/components/DashboardCards';
@@ -102,6 +101,7 @@ const getGeneralData = (dateRange: DateRange) => {
 
 const Index = () => {
   const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
+  const [activeTab, setActiveTab] = useState('overview');
   const period: Period = 'custom';
   const generalData = getGeneralData(dateRange);
 
@@ -125,14 +125,27 @@ const Index = () => {
     });
   }, [dateRange]);
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+  };
+
   return (
     <NewDashboardLayout 
       dateRange={dateRange} 
       onDateRangeChange={setDateRange}
+      onTabChange={handleTabChange}
     >
       <div className="px-6">
         <DashboardCards />
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="overview">Vendas</TabsTrigger>
+            <TabsTrigger value="customers">Clientes</TabsTrigger>
+            <TabsTrigger value="marketing">Marketing</TabsTrigger>
+            <TabsTrigger value="analysis">Análise Geral</TabsTrigger>
+            <TabsTrigger value="goals">Metas</TabsTrigger>
+          </TabsList>
+          
           <TabsContent value="overview" className="space-y-6">
             <SalesOverview period={period} dateRange={dateRange} />
           </TabsContent>

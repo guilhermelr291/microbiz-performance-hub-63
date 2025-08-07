@@ -1,105 +1,94 @@
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, Settings, Download, FileSpreadsheet, ChevronDown, Bell } from 'lucide-react';
-import { ThemeToggle } from './ThemeProvider';
 
-const navigationItems = [
-  { id: 'dashboard', label: 'Dashboard', active: true },
-  { id: 'analytics', label: 'Analytics', active: false },
-  { id: 'products', label: 'Products', active: false },
-  { id: 'customers', label: 'Customers', active: false },
-  { id: 'messages', label: 'Messages', active: false, badge: 5 }
-];
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Bell, Search, Download, Upload, ChevronDown } from 'lucide-react';
+import { ThemeToggle } from './ThemeProvider';
 
 interface TopNavigationProps {
   onTabChange?: (tabId: string) => void;
 }
 
 export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = React.useState('overview');
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
     onTabChange?.(tabId);
   };
 
+  const navItems = [
+    { id: 'overview', label: 'Dashboard', active: activeTab === 'overview' },
+    { id: 'analytics', label: 'Analytics', active: activeTab === 'analytics' },
+    { id: 'customers', label: 'Customers', active: activeTab === 'customers' },
+    { id: 'marketing', label: 'Marketing', active: activeTab === 'marketing' },
+    { id: 'analysis', label: 'Analysis', active: activeTab === 'analysis' },
+    { id: 'goals', label: 'Goals', active: activeTab === 'goals' },
+  ];
+
   return (
-    <nav className="w-full bg-background border-b border-border">
-      <div className="px-6 py-4">
-        {/* Logo and Navigation */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-foreground rounded-full flex items-center justify-center">
-                <span className="text-background text-sm font-bold">Z</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">ZenZest</span>
+    <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="flex items-center justify-between">
+        {/* Left side - Navigation */}
+        <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">L</span>
             </div>
-
-            {/* Navigation Items */}
-            <div className="flex items-center space-x-6">
-              {navigationItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabClick(item.id)}
-                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === item.id
-                      ? 'bg-success text-success-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {item.label}
-                  {item.badge && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-1 -right-1 min-w-[20px] h-5 text-xs flex items-center justify-center"
-                    >
-                      {item.badge}
-                    </Badge>
-                  )}
-                </button>
-              ))}
-            </div>
+            <span className="font-semibold text-lg text-gray-900 dark:text-white">Dashboard</span>
           </div>
+          
+          <nav className="flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleTabClick(item.id)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  item.active 
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' 
+                    : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
+              >
+                {item.label}
+                {item.id === 'goals' && (
+                  <span className="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">3</span>
+                )}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-          {/* Right Side - Settings, Notifications, and User */}
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Settings className="h-4 w-4" />
-            </Button>
-            
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Bell className="h-4 w-4" />
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 px-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt="User" />
-                    <AvatarFallback className="bg-primary text-primary-foreground">SR</AvatarFallback>
-                  </Avatar>
-                  <div className="text-left">
-                    <div className="text-sm font-medium">Steve Rogers</div>
-                    <div className="text-xs text-muted-foreground">Super Admin</div>
-                  </div>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Right side - Actions */}
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search here..."
+              className="pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <Button variant="outline" size="sm" className="text-sm">
+            <Upload className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          
+          <Button variant="outline" size="sm" className="text-sm">
+            <Download className="h-4 w-4 mr-2" />
+            Download Report
+          </Button>
+          
+          <ThemeToggle />
+          
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">JD</span>
+            </div>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">John Doe</span>
+            <ChevronDown className="h-4 w-4 text-gray-500" />
           </div>
         </div>
       </div>
-    </nav>
+    </div>
   );
 };

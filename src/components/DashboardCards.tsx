@@ -1,7 +1,8 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, ArrowRight, Target, ShoppingCart } from 'lucide-react';
+import { MoreHorizontal, ArrowRight, Target, ShoppingCart, TrendingUp, DollarSign } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 // Sample data that matches the image
@@ -11,6 +12,16 @@ const volumeData = 257361;
 const volumeComparison = 54;
 const profitData = 96715.28;
 const profitComparison = 54;
+
+// Faturamento data from the removed section
+const totalRevenue = 78500;
+const revenueComparison = 22;
+const productRevenue = 42200;
+const productComparison = 18;
+const serviceRevenue = 36300;
+const serviceComparison = 26;
+const ticketAverage = 265;
+const ticketComparison = 8;
 
 const chartData = [
   { name: 'Jan', value: 18000 },
@@ -33,9 +44,81 @@ const COLORS = ['#8B5CF6', '#FCD34D', '#FB7185', '#A78BFA'];
 
 export const DashboardCards = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-6 mb-6">
+      {/* Faturamento Total */}
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Faturamento Total
+          </CardTitle>
+          <DollarSign className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">R$ {totalRevenue.toLocaleString()}</div>
+          <div className="flex items-center space-x-2 mt-2">
+            <Badge className="text-xs bg-success text-success-foreground">
+              +{revenueComparison}% ↑
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Faturamento em Produtos */}
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Faturamento em Produtos
+          </CardTitle>
+          <Target className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">R$ {productRevenue.toLocaleString()}</div>
+          <div className="flex items-center space-x-2 mt-2">
+            <Badge className="text-xs bg-success text-success-foreground">
+              +{productComparison}% ↑
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Faturamento em Serviços */}
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Faturamento em Serviços
+          </CardTitle>
+          <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">R$ {serviceRevenue.toLocaleString()}</div>
+          <div className="flex items-center space-x-2 mt-2">
+            <Badge className="text-xs bg-success text-success-foreground">
+              +{serviceComparison}% ↑
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Ticket Médio */}
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Ticket Médio
+          </CardTitle>
+          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">R$ {ticketAverage.toLocaleString()}</div>
+          <div className="flex items-center space-x-2 mt-2">
+            <Badge className="text-xs bg-success text-success-foreground">
+              +{ticketComparison}% ↑
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Total Products Sales Card */}
-      <Card className="rounded-xl shadow-md">
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Products Sales
@@ -57,7 +140,7 @@ export const DashboardCards = () => {
       </Card>
 
       {/* Total Volume Of Products Card */}
-      <Card className="rounded-xl shadow-md">
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-1 lg:col-span-1 xl:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Volume Of Products
@@ -79,7 +162,7 @@ export const DashboardCards = () => {
       </Card>
 
       {/* Total Profit Overview Card */}
-      <Card className="rounded-xl shadow-md col-span-1 md:col-span-2 lg:col-span-1">
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-2 lg:col-span-1 xl:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Profit Overview
@@ -129,7 +212,7 @@ export const DashboardCards = () => {
       </Card>
 
       {/* Total Sales Statistics Card */}
-      <Card className="rounded-xl shadow-md">
+      <Card className="rounded-xl shadow-md col-span-1 md:col-span-2 lg:col-span-1 xl:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Sales Statistics
