@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,14 +17,23 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check for stored preference or system preference
-    const storedTheme = localStorage.getItem("theme") as Theme;
-    if (storedTheme) {
-      return storedTheme;
-    }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
+  // Simplified initial state without complex logic
+  const [theme, setTheme] = useState<Theme>("light");
+
+  // Initialize theme after component mounts
+  useEffect(() => {
+    const initializeTheme = () => {
+      const storedTheme = localStorage.getItem("theme") as Theme;
+      if (storedTheme) {
+        setTheme(storedTheme);
+      } else {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        setTheme(systemTheme);
+      }
+    };
+    
+    initializeTheme();
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
