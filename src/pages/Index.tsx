@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DashboardLayout from '@/components/DashboardLayout';
+import NewDashboardLayout from '@/components/NewDashboardLayout';
 import SalesOverview from '@/components/SalesOverview';
 import CustomerMetrics from '@/components/CustomerMetrics';
 import MarketingPerformance from '@/components/MarketingPerformance';
 import MetricsHeader from '@/components/MetricsHeader';
 import MenuGoals from '@/components/MenuGoals';
 import { GeneralAnalysis } from '@/components/GeneralAnalysis';
+import { DashboardCards } from '@/components/DashboardCards';
 import { Period, DateRange } from '@/types/metrics';
 
 // Helper function to get previous month's equivalent date range
@@ -125,22 +126,13 @@ const Index = () => {
   }, [dateRange]);
 
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6 md:p-8">
-        <MetricsHeader 
-          dateRange={dateRange} 
-          onDateRangeChange={setDateRange} 
-        />
-        
+    <NewDashboardLayout 
+      dateRange={dateRange} 
+      onDateRangeChange={setDateRange}
+    >
+      <div className="px-6">
+        <DashboardCards />
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Vendas</TabsTrigger>
-            <TabsTrigger value="customers">Clientes</TabsTrigger>
-            <TabsTrigger value="marketing">Marketing</TabsTrigger>
-            <TabsTrigger value="analysis">Análise Geral</TabsTrigger>
-            <TabsTrigger value="goals">Metas</TabsTrigger>
-          </TabsList>
-          
           <TabsContent value="overview" className="space-y-6">
             <SalesOverview period={period} dateRange={dateRange} />
           </TabsContent>
@@ -167,7 +159,7 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </NewDashboardLayout>
   );
 };
 

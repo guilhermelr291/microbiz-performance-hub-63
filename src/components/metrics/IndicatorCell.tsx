@@ -15,20 +15,20 @@ export const IndicatorCell = ({ value, comparison, goalValue, status, isPercenta
   
   switch (status) {
     case 'success':
-      bgColor = 'bg-[#2ecc71]';
-      textColor = 'text-white';
+      bgColor = 'bg-success';
+      textColor = 'text-success-foreground';
       break;
     case 'warning':
-      bgColor = 'bg-[#FEF7CD]';
-      textColor = 'text-black';
+      bgColor = 'bg-warning';
+      textColor = 'text-warning-foreground';
       break;
     case 'danger':
-      bgColor = 'bg-[#ea384c]';
-      textColor = 'text-white';
+      bgColor = 'bg-danger';
+      textColor = 'text-danger-foreground';
       break;
     default:
-      bgColor = 'bg-gray-100 dark:bg-gray-800';
-      textColor = 'text-gray-700 dark:text-gray-300';
+      bgColor = 'bg-muted';
+      textColor = 'text-muted-foreground';
   }
 
   // Format value based on whether it's a percentage or not
@@ -40,7 +40,7 @@ export const IndicatorCell = ({ value, comparison, goalValue, status, isPercenta
   const goalText = goalValue ? ` / Meta: ${isPercentage ? `${goalValue}%` : goalValue.toLocaleString('pt-BR')}` : '';
   
   // For the comparison indicator styling
-  const comparisonColor = comparison > 0 ? 'text-green-500' : comparison < 0 ? 'text-red-500' : 'text-gray-500';
+  const comparisonColor = comparison > 0 ? 'text-success' : comparison < 0 ? 'text-danger' : 'text-muted-foreground';
   
   return (
     <div className={`flex items-center justify-between px-4 py-2 rounded-md ${bgColor} ${textColor} font-medium`}>
