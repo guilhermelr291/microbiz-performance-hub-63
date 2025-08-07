@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DateRange } from '@/types/metrics';
 import { DateRangePicker } from '@/components/DateRangePicker';
-
+import { Button } from '@/components/ui/button';
+import * as XLSX from 'xlsx';
 export type SaleStatus = 'concluída' | 'cancelada';
 export type SaleType = 'produto' | 'serviço';
 
@@ -117,6 +118,27 @@ const SalesList = () => {
     });
   }, [effectiveRange, descricao, tipo]);
 
+  const dataToExport = useMemo(() => rows.map((s) => ({
+    'Data da Venda': new Date(s.dataVenda).toLocaleDateString('pt-BR'),
+    'Código': s.codigo,
+    'Descrição': s.descricao,
+    'Quantidade': s.quantidade,
+    'Valor unitário': currency.format(s.valorUnitario),
+    'Valor total': currency.format(s.valorTotal),
+    'Cliente': s.cliente,
+    'CPF': s.cpf,
+    'Data de Cadastro': new Date(s.dataCadastro).toLocaleDateString('pt-BR'),
+    'Tipo': s.tipo.charAt(0).toUpperCase() + s.tipo.slice(1),
+    'Status': s.status === 'concluída' ? 'Concluída' : 'Cancelada',
+  })), [rows]);
+
+  const handleExport = () => {
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Vendas');
+    XLSX.writeFile(wb, `vendas_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
   return (
     <section className="w-full space-y-4">
       <Card>
@@ -124,6 +146,11 @@ const SalesList = () => {
           <CardTitle>Vendas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex justify-end">
+            <Button variant="secondary" onClick={handleExport} aria-label="Exportar lista de vendas para Excel">
+              Exportar Excel
+            </Button>
+          </div>
           {/* Filtros */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
