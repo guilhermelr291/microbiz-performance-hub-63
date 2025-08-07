@@ -19,6 +19,10 @@ interface AuthContextValue {
   hasRole: (role: Role) => boolean;
 }
 
+const DEMO_EMAIL = 'admin@demo.com';
+const DEMO_PASS = 'demo123';
+const DEMO_TOKEN = 'demo-token';
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -35,6 +39,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
+    // Demo mode short-circuit
+    if (email === DEMO_EMAIL && password === DEMO_PASS) {
+      const demoUser: AuthUser = {
+        id: 'demo-user',
+        email: DEMO_EMAIL,
+        name: 'Demo Admin',
+        roles: ['admin'],
+      };
+      localStorage.setItem('authToken', DEMO_TOKEN);
+      localStorage.setItem('authUser', JSON.stringify(demoUser));
+      localStorage.setItem('demoMode', 'true');
+      setToken(DEMO_TOKEN);
+      setUser(demoUser);
+      return demoUser;
+    }
+
+    // Real API login
     const { data } = await api.post('/auth/login', { email, password });
     const receivedToken: string = data?.token;
     const receivedUser: AuthUser = data?.user;
@@ -43,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     localStorage.setItem('authToken', receivedToken);
     localStorage.setItem('authUser', JSON.stringify(receivedUser));
+    localStorage.removeItem('demoMode');
     setToken(receivedToken);
     setUser(receivedUser);
     return receivedUser;
@@ -53,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('authUser');
     localStorage.removeItem('licenseId');
     localStorage.removeItem('licenseName');
+    localStorage.removeItem('demoMode');
     setUser(null);
     setToken(null);
   };

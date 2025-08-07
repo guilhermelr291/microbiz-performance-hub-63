@@ -28,12 +28,40 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(email, password);
+      // If demo token is set, preload demo licenses
+      const isDemo = localStorage.getItem('demoMode') === 'true';
+      if (isDemo) {
+        setLicenses([
+          { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
+          { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
+        ]);
+        navigate('/select-license');
+        toast({ title: 'Modo demo ativo', description: 'Use uma das licenças de exemplo para navegar.' });
+        return;
+      }
       // Fetch licenses for this user after login
       const { data } = await api.get('/auth/licenses');
       setLicenses(data || []);
       navigate('/select-license');
     } catch (err: any) {
       toast({ title: 'Falha no login', description: err?.message || 'Verifique suas credenciais.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setLoading(true);
+    try {
+      await login('admin@demo.com', 'demo123');
+      setLicenses([
+        { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
+        { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
+      ]);
+      toast({ title: 'Modo demo ativo', description: 'Você entrou com um usuário de demonstração.' });
+      navigate('/select-license');
+    } catch (err: any) {
+      toast({ title: 'Erro ao iniciar demo', description: err?.message || 'Tente novamente.', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -59,6 +87,11 @@ const Login: React.FC = () => {
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
+          <div className="pt-4">
+            <Button variant="secondary" onClick={handleDemo} className="w-full" disabled={loading}>
+              {loading ? 'Iniciando demo...' : 'Entrar em modo demo'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </main>
