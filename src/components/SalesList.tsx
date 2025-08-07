@@ -185,6 +185,7 @@ const SalesList = () => {
                   <TableHead>Cliente</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Data de Cadastro</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -200,6 +201,7 @@ const SalesList = () => {
                     <TableCell>{s.cliente}</TableCell>
                     <TableCell>{s.cpf}</TableCell>
                     <TableCell>{new Date(s.dataCadastro).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell>{s.tipo.charAt(0).toUpperCase() + s.tipo.slice(1)}</TableCell>
                     <TableCell>
                       <StatusPill status={s.status} />
                     </TableCell>
