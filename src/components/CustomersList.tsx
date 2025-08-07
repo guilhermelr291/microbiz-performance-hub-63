@@ -3,7 +3,8 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-
+import { Button } from '@/components/ui/button';
+import * as XLSX from 'xlsx';
 export type CustomerStatus = 'ativo' | 'inativo';
 
 export interface Customer {
@@ -65,6 +66,22 @@ const CustomersList = () => {
     });
   }, [customers, nome, documento]);
 
+  const dataToExport = useMemo(() =>
+    rows.map((c) => ({
+      'Nome': c.nome,
+      'CPF/CNPJ': c.documento,
+      'Data de Cadastro': new Date(c.dataCadastro).toLocaleDateString('pt-BR'),
+      'Status': c.status === 'ativo' ? 'Ativo' : 'Inativo',
+    })),
+  [rows]);
+
+  const handleExport = () => {
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+    XLSX.writeFile(wb, `clientes_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
   return (
     <section className="w-full">
       <Card>
@@ -72,6 +89,11 @@ const CustomersList = () => {
           <CardTitle>Clientes</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-end mb-3">
+            <Button variant="secondary" onClick={handleExport} aria-label="Exportar lista de clientes para Excel">
+              Exportar Excel
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div>
               <label className="block text-sm font-medium mb-1">Nome</label>
