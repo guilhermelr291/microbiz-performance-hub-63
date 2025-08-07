@@ -1,25 +1,18 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Bell, Search, Download, Upload, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { ThemeToggle } from './ThemeProvider';
+import { NavLink } from 'react-router-dom';
 
 interface TopNavigationProps {
   onTabChange?: (tabId: string) => void;
 }
 
 export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
-  const [activeTab, setActiveTab] = React.useState('overview');
-
-  const handleTabClick = (tabId: string) => {
-    setActiveTab(tabId);
-    onTabChange?.(tabId);
-  };
-
   const navItems = [
-    { id: 'overview', label: 'Dashboard', active: activeTab === 'overview' },
-    { id: 'clientes', label: 'Clientes', active: activeTab === 'clientes' },
-    { id: 'vendas', label: 'Vendas', active: activeTab === 'vendas' },
+    { to: '/', label: 'Dashboard' },
+    { to: '/clientes', label: 'Clientes' },
+    { to: '/vendas', label: 'Vendas' },
   ];
 
   return (
@@ -36,17 +29,19 @@ export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
           
           <nav className="flex space-x-6">
             {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  item.active 
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' 
-                    : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                }`}
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                  }`
+                }
               >
                 {item.label}
-              </button>
+              </NavLink>
             ))}
           </nav>
           
@@ -54,11 +49,7 @@ export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
 
         {/* Right side - Actions */}
         <div className="flex items-center space-x-4">
-          
-          
-          
           <ThemeToggle />
-          
           <div className="flex items-center space-x-2 cursor-pointer">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-medium">JD</span>

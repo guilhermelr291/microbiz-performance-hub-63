@@ -8,18 +8,24 @@ interface NewDashboardLayoutProps {
   dateRange?: DateRange;
   onDateRangeChange?: (dateRange: DateRange) => void;
   onTabChange?: (tabId: string) => void;
+  headerTitle?: string;
+  headerDescription?: string;
 }
 
 const NewDashboardLayout = ({ 
   children, 
   dateRange, 
   onDateRangeChange,
-  onTabChange 
+  onTabChange,
+  headerTitle,
+  headerDescription,
 }: NewDashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       <TopNavigation onTabChange={onTabChange} />
       <DashboardHeader 
+        title={headerTitle}
+        description={headerDescription}
         dateRange={dateRange} 
         onDateRangeChange={onDateRangeChange} 
       />
