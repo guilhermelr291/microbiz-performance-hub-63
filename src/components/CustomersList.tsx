@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 
 export type CustomerStatus = 'ativo' | 'inativo';
 
@@ -46,8 +47,23 @@ const StatusPill = ({ status }: { status: CustomerStatus }) => {
 
 const CustomersList = () => {
   const [customers] = useState<Customer[]>(mockCustomers);
+  const [nome, setNome] = useState('');
+  const [documento, setDocumento] = useState('');
 
-  const rows = useMemo(() => customers, [customers]);
+  const rows = useMemo(() => {
+    const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const onlyDigits = (s: string) => s.replace(/\D/g, '');
+
+    const filtroNome = normalize(nome.toLowerCase());
+    const filtroDoc = onlyDigits(documento);
+
+    return customers.filter((c) => {
+      const nomeMatch = filtroNome ? normalize(c.nome.toLowerCase()).includes(filtroNome) : true;
+      const docDigits = onlyDigits(c.documento);
+      const docMatch = filtroDoc ? docDigits.includes(filtroDoc) : true;
+      return nomeMatch && docMatch;
+    });
+  }, [customers, nome, documento]);
 
   return (
     <section className="w-full">
@@ -56,6 +72,24 @@ const CustomersList = () => {
           <CardTitle>Clientes</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nome</label>
+              <Input
+                placeholder="Filtrar por nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">CPF/CNPJ</label>
+              <Input
+                placeholder="Filtrar por CPF/CNPJ"
+                value={documento}
+                onChange={(e) => setDocumento(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="w-full overflow-x-auto">
             <Table>
               <TableHeader>
