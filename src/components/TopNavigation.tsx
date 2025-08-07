@@ -3,12 +3,15 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ThemeToggle } from './ThemeProvider';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TopNavigationProps {
   onTabChange?: (tabId: string) => void;
 }
 
 export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
+  const { isAuthenticated, hasRole } = useAuth();
+  const isAdmin = isAuthenticated && hasRole('admin');
   const navItems = [
     { to: '/', label: 'Dashboard' },
     { to: '/clientes', label: 'Clientes' },
@@ -43,6 +46,20 @@ export const TopNavigation = ({ onTabChange }: TopNavigationProps) => {
                 {item.label}
               </NavLink>
             ))}
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                  }`
+                }
+              >
+                Admin
+              </NavLink>
+            )}
           </nav>
           
         </div>
