@@ -6,50 +6,48 @@ interface FunnelStageProps {
   label: string;
   value: number;
   previousValue?: number;
-  color: string;
+  colorClass: string;
   width: string;
   conversionRate?: number;
   goalRate?: number;
 }
 
 const ConversionBadge = ({ rate, previousRate, goalRate }: { rate: number; previousRate: number; goalRate: number }) => {
-  let bgColor = "";
+  // Use design tokens for consistent theming and contrast
+  let cls = "";
   if (rate < previousRate && rate < goalRate) {
-    bgColor = "bg-[#ea384c]";
+    cls = "bg-destructive text-destructive-foreground";
   } else if (rate > previousRate && rate < goalRate) {
-    bgColor = "bg-[#FEF7CD] text-black";
+    cls = "bg-accent text-accent-foreground";
   } else {
-    bgColor = "bg-[#2ecc71]";
+    cls = "bg-primary text-primary-foreground";
   }
   
   return (
-    <div className={`${bgColor} rounded-lg px-3 py-1 text-white font-medium backdrop-blur-sm`}>
+    <div className={`${cls} rounded-md px-2.5 py-1 text-xs font-medium shadow-sm`}>
       {rate.toFixed(1)}%
     </div>
   );
 };
 
-const FunnelStage = ({ label, value, previousValue, color, width, conversionRate, goalRate }: FunnelStageProps) => (
-  <div className="flex items-center w-full gap-4">
+const FunnelStage = ({ label, value, previousValue, colorClass, width, conversionRate, goalRate }: FunnelStageProps) => (
+  <div className="flex items-center w-full gap-4 animate-fade-in">
     <div className="relative w-full">
       <div 
-        style={{ 
-          width,
-          background: `linear-gradient(135deg, ${color} 0%, rgba(255,255,255,0.5) 50%, ${color} 100%)`,
-        }} 
-        className="h-20 flex items-center justify-center text-white font-medium rounded-lg shadow-lg backdrop-blur-sm"
+        style={{ width }}
+        className={`h-16 md:h-20 flex items-center justify-center rounded-lg shadow-lg ring-1 ring-border ${colorClass}`}
       >
         <div className="text-center">
-          <div>{label}</div>
-          <div className="text-lg font-bold">{value}</div>
+          <div className="text-sm md:text-base font-medium">{label}</div>
+          <div className="text-lg md:text-xl font-bold">{value}</div>
           {previousValue !== undefined && (
-            <div className="text-sm opacity-75">Anterior: {previousValue}</div>
+            <div className="text-xs md:text-sm opacity-90">Anterior: {previousValue}</div>
           )}
         </div>
       </div>
     </div>
     {conversionRate !== undefined && goalRate !== undefined && previousValue !== undefined && (
-      <div className="min-w-[100px]">
+      <div className="min-w-[80px] md:min-w-[100px]">
         <ConversionBadge rate={conversionRate} previousRate={previousValue} goalRate={goalRate} />
       </div>
     )}
@@ -68,7 +66,11 @@ interface FunnelChartProps {
 }
 
 const FunnelChart = ({ data, title, subtitle }: FunnelChartProps) => {
-  const colors = ['#FFD700', '#4169E1', '#228B22']; // Metallic yellow, blue, and green
+  const colorClasses = [
+    "bg-gradient-to-r from-primary/90 to-primary text-primary-foreground",
+    "bg-gradient-to-r from-accent/90 to-accent text-accent-foreground",
+    "bg-gradient-to-r from-secondary/90 to-secondary text-secondary-foreground",
+  ];
   
   const getConversionRate = (currentIndex: number) => {
     if (currentIndex === 0) return undefined;
@@ -92,7 +94,7 @@ const FunnelChart = ({ data, title, subtitle }: FunnelChartProps) => {
                 label={item.name}
                 value={item.current}
                 previousValue={item.previous}
-                color={colors[index]}
+                colorClass={colorClasses[index % colorClasses.length]}
                 width={`${100 - index * 15}%`}
                 conversionRate={getConversionRate(index)}
                 goalRate={item.goalRate}
