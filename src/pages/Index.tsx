@@ -13,6 +13,7 @@ import SalesList from '@/components/SalesList';
 import MetricsHeader from '@/components/MetricsHeader';
 import { Period, DateRange } from '@/types/metrics';
 import { useGoals } from '@/contexts/GoalsContext';
+import { ImportVendasDialog } from '@/components/ImportVendasDialog';
 
 // Helper function to get previous month's equivalent date range
 const getPreviousMonthDateRange = (dateRange: DateRange): DateRange => {
@@ -120,6 +121,9 @@ const Index = () => {
     <DashboardLayout headerTitle="Dashboard">
       <div className="px-6">
         <DashboardCards />
+        <div className="flex items-center justify-end mb-4">
+          <ImportVendasDialog />
+        </div>
         <MetricsHeader 
           dateRange={dateRange} 
           onDateRangeChange={setDateRange} 
