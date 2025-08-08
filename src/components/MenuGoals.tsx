@@ -3,28 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useGoals } from "@/contexts/GoalsContext";
 import { Goals } from "@/types/metrics";
 import { toast } from "@/hooks/use-toast";
-
-const createInitialGoals = (): Goals => ({
-  sales: 85000,
-  productRevenue: 42000,
-  serviceRevenue: 43000,
-  ticketAverage: 265,
-  customers: 300,
-  newCustomers: 90,
-  productsPerClient: 2.0,
-  servicesPerClient: 3.5,
-  marketing: 5000,
-  leadsGenerated: 260,
-  leadsMeetings: 170,
-  marketingSales: 105,
-  cpl: 19.25,
-  leadToMeetingRate: 65.4,
-  meetingToSaleRate: 61.8,
-  roas: 6.0
-});
 
 const GoalInput = ({ 
   label, 
@@ -58,17 +39,17 @@ const GoalInput = ({
 };
 
 const MenuGoals = () => {
-  const [goals, setGoals] = useState<Goals>(createInitialGoals());
+  const { goals, updateGoals, saveGoals } = useGoals();
 
   const handleGoalChange = (key: keyof Goals, value: number) => {
-    setGoals(prev => ({
-      ...prev,
+    updateGoals({
+      ...goals,
       [key]: value
-    }));
+    });
   };
 
   const handleSave = () => {
-    console.log('Goals saved:', goals);
+    saveGoals();
     toast({
       title: "Metas atualizadas",
       description: "As metas mensais foram atualizadas com sucesso.",

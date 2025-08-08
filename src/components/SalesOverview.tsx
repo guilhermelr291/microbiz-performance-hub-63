@@ -4,11 +4,12 @@ import { Grid } from '@/components/ui/grid';
 import ComparisonCard from '@/components/ComparisonCard';
 import KpiChart from '@/components/KpiChart';
 import { DataAnalysis } from '@/components/DataAnalysis';
+import { useGoals } from '@/contexts/GoalsContext';
 import { Period, DateRange } from '@/types/metrics';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-const getSalesData = (period: Period, dateRange?: DateRange) => {
+const getSalesData = (period: Period, dateRange?: DateRange, goals?: any) => {
   // Simple function to generate dates for chart labels based on date range
   const generateDateLabels = (startDate: Date, endDate: Date, numPoints: number) => {
     const result = [];
@@ -48,7 +49,7 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
     const totalRevenue = Math.round(78500 * scaleFactor);
     const productRevenue = Math.round(42200 * scaleFactor);
     const serviceRevenue = Math.round(36300 * scaleFactor);
-    const goalValue = Math.round(85000 * scaleFactor);
+    const goalValue = Math.round((goals?.sales || 85000) * scaleFactor);
     
     // Generate sales chart data
     const salesChart = dateLabels.map((item, index) => {
@@ -76,14 +77,14 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
           name: 'Produtos', 
           current: productRevenue, 
           previous: Math.round(productRevenue * 0.85),
-          goal: Math.round(productRevenue * 1.2),
+          goal: Math.round((goals?.productRevenue || 42000) * scaleFactor),
           comparison: Math.round(((productRevenue - Math.round(productRevenue * 0.85)) / Math.round(productRevenue * 0.85)) * 100)
         },
         { 
           name: 'Serviços', 
           current: serviceRevenue, 
           previous: Math.round(serviceRevenue * 0.8),
-          goal: Math.round(serviceRevenue * 1.15),
+          goal: Math.round((goals?.serviceRevenue || 43000) * scaleFactor),
           comparison: Math.round(((serviceRevenue - Math.round(serviceRevenue * 0.8)) / Math.round(serviceRevenue * 0.8)) * 100)
         },
       ],
@@ -116,14 +117,14 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
           name: 'Produtos', 
           current: 42200, 
           previous: 36000,
-          goal: 50000,
+          goal: goals?.productRevenue || 42000,
           comparison: Math.round(((42200 - 36000) / 36000) * 100)
         },
         { 
           name: 'Serviços', 
           current: 36300, 
           previous: 28800,
-          goal: 42000,
+          goal: goals?.serviceRevenue || 43000,
           comparison: Math.round(((36300 - 28800) / 28800) * 100)
         },
       ],
@@ -133,7 +134,7 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
         { name: '15/04', current: 270, previous: 250 },
         { name: '22/04', current: 265, previous: 245 },
       ],
-      goalValue: 85000,
+      goalValue: goals?.sales || 85000,
     };
   }
 };
@@ -144,7 +145,8 @@ interface SalesOverviewProps {
 }
 
 const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
-  const data = getSalesData(period, dateRange);
+  const { goals } = useGoals();
+  const data = getSalesData(period, dateRange, goals);
   const goalPercentage = data.goalValue ? (data.totalRevenue / data.goalValue) * 100 : 0;
   
   const getPeriodDescription = () => {

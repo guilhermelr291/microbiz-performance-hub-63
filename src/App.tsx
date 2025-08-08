@@ -14,6 +14,7 @@ import SelectLicense from "./pages/SelectLicense";
 import Admin from "./pages/Admin";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LicenseProvider } from "./contexts/LicenseContext";
+import { GoalsProvider } from "./contexts/GoalsContext";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <LicenseProvider>
+            <GoalsProvider>
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<Login />} />
@@ -51,6 +53,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            </GoalsProvider>
           </LicenseProvider>
         </AuthProvider>
       </TooltipProvider>
