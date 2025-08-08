@@ -92,6 +92,7 @@ const getSalesData = (period: Period, dateRange?: DateRange, goals?: any) => {
         name: item.label,
         current: 265 + Math.round(Math.random() * 20 - 10),
         previous: 250 + Math.round(Math.random() * 20 - 10),
+        goal: goals?.ticketAverage || 265,
       })),
       goalValue,
     };
@@ -129,10 +130,10 @@ const getSalesData = (period: Period, dateRange?: DateRange, goals?: any) => {
         },
       ],
       ticketChart: [
-        { name: '01/04', current: 260, previous: 240 },
-        { name: '08/04', current: 265, previous: 245 },
-        { name: '15/04', current: 270, previous: 250 },
-        { name: '22/04', current: 265, previous: 245 },
+        { name: '01/04', current: 260, previous: 240, goal: goals?.ticketAverage || 265 },
+        { name: '08/04', current: 265, previous: 245, goal: goals?.ticketAverage || 265 },
+        { name: '15/04', current: 270, previous: 250, goal: goals?.ticketAverage || 265 },
+        { name: '22/04', current: 265, previous: 245, goal: goals?.ticketAverage || 265 },
       ],
       goalValue: goals?.sales || 85000,
     };
@@ -215,6 +216,7 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
           type="line"
           comparison={data.ticketComparison}
           prefix="R$ "
+          goalValue={goals?.ticketAverage}
         />
       </div>
 
