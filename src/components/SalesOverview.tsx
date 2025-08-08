@@ -195,12 +195,14 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
           comparison={data.revenueComparison}
           prefix="R$ "
           goalValue={data.goalValue}
+          height={375}
         />
         <KpiChart 
           title="Faturamento por Tipo" 
           data={data.revenueByType}
           type="bar"
           prefix="R$ "
+          height={375}
         />
       </div>
 
