@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import NewDashboardLayout from '@/components/NewDashboardLayout';
+import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ const Admin: React.FC = () => {
   };
 
   return (
-    <NewDashboardLayout headerTitle="Admin" headerDescription="Gestão de licenças e acessos.">
+    <DashboardLayout headerTitle="Admin">
       <main className="px-6 grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -96,7 +96,7 @@ const Admin: React.FC = () => {
           </CardContent>
         </Card>
       </main>
-    </NewDashboardLayout>
+    </DashboardLayout>
   );
 };
 

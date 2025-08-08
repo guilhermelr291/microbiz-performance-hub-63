@@ -4,12 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, BarChart, Users, DollarSign, PieChart, Settings } from 'lucide-react';
 import { ThemeToggle } from './ThemeProvider';
+import { NavLink } from 'react-router-dom';
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  headerTitle?: string;
 }
 
-const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -23,22 +25,22 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <SidebarContent className="p-2">
             <nav className="space-y-2">
               <Button variant="sidebar" className="w-full justify-start" asChild>
-                <a href="/" className="flex items-center">
+                <NavLink to="/" className="flex items-center">
                   <BarChart className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>
-                </a>
+                </NavLink>
               </Button>
               <Button variant="sidebar" className="w-full justify-start" asChild>
-                <a href="#" className="flex items-center">
+                <NavLink to="/vendas" className="flex items-center">
                   <DollarSign className="mr-2 h-4 w-4" />
                   <span>Vendas</span>
-                </a>
+                </NavLink>
               </Button>
               <Button variant="sidebar" className="w-full justify-start" asChild>
-                <a href="#" className="flex items-center">
+                <NavLink to="/clientes" className="flex items-center">
                   <Users className="mr-2 h-4 w-4" />
                   <span>Clientes</span>
-                </a>
+                </NavLink>
               </Button>
               <Button variant="sidebar" className="w-full justify-start" asChild>
                 <a href="#" className="flex items-center">
@@ -77,7 +79,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
-              <h2 className="text-lg font-semibold">Dashboard de Performance</h2>
+              <h2 className="text-lg font-semibold">{headerTitle || 'Dashboard'}</h2>
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />

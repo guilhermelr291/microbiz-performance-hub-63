@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import NewDashboardLayout from '@/components/NewDashboardLayout';
+import DashboardLayout from '@/components/DashboardLayout';
 import CustomersList from '@/components/CustomersList';
 
 const Clientes = () => {
@@ -8,11 +8,11 @@ const Clientes = () => {
   }, []);
 
   return (
-    <NewDashboardLayout headerTitle="Clientes" headerDescription="">
+    <DashboardLayout headerTitle="Clientes">
       <div className="px-6">
         <CustomersList />
       </div>
-    </NewDashboardLayout>
+    </DashboardLayout>
   );
 };
 

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import NewDashboardLayout from '@/components/NewDashboardLayout';
+import DashboardLayout from '@/components/DashboardLayout';
 import SalesOverview from '@/components/SalesOverview';
 import CustomerMetrics from '@/components/CustomerMetrics';
 import MarketingPerformance from '@/components/MarketingPerformance';
@@ -117,11 +117,7 @@ const Index = () => {
   };
 
   return (
-    <NewDashboardLayout 
-      dateRange={dateRange} 
-      onDateRangeChange={setDateRange}
-      onTabChange={handleTabChange}
-    >
+    <DashboardLayout headerTitle="Dashboard">
       <div className="px-6">
         <DashboardCards />
         <MetricsHeader 
@@ -171,7 +167,7 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </NewDashboardLayout>
+    </DashboardLayout>
   );
 };
 
