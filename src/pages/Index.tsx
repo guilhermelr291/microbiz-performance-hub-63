@@ -121,7 +121,7 @@ const Index = () => {
     <DashboardLayout headerTitle="Dashboard">
       <div className="px-6">
         <DashboardCards />
-        <div className="flex items-center justify-end mb-4">
+        <div className="flex items-center justify-end mt-4 mb-4">
           <ImportVendasDialog />
         </div>
         <MetricsHeader 
