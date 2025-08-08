@@ -161,8 +161,30 @@ const KpiChart = ({
                 tickMargin={8}
               />
               <Tooltip 
-                formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
-                labelFormatter={(label) => `${label}`}
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-background border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
+                        <p className="font-medium text-foreground mb-2">{label}</p>
+                        {payload.map((entry, index) => (
+                          <div key={index} className="flex items-center justify-between mb-1">
+                            <div className="flex items-center">
+                              <div 
+                                className="w-3 h-3 rounded-sm mr-2" 
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="text-sm text-muted-foreground">{entry.name}:</span>
+                            </div>
+                            <span className="text-sm font-medium text-foreground ml-2">
+                              {prefix}{entry.value}{suffix}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
               <Legend 
                 verticalAlign="bottom" 
