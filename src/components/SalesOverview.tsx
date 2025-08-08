@@ -76,13 +76,15 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
           name: 'Produtos', 
           current: productRevenue, 
           previous: Math.round(productRevenue * 0.85),
-          goal: Math.round(productRevenue * 1.2)
+          goal: Math.round(productRevenue * 1.2),
+          comparison: Math.round(((productRevenue - Math.round(productRevenue * 0.85)) / Math.round(productRevenue * 0.85)) * 100)
         },
         { 
           name: 'Serviços', 
           current: serviceRevenue, 
           previous: Math.round(serviceRevenue * 0.8),
-          goal: Math.round(serviceRevenue * 1.15)
+          goal: Math.round(serviceRevenue * 1.15),
+          comparison: Math.round(((serviceRevenue - Math.round(serviceRevenue * 0.8)) / Math.round(serviceRevenue * 0.8)) * 100)
         },
       ],
       ticketChart: dateLabels.map((item) => ({
@@ -114,13 +116,15 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
           name: 'Produtos', 
           current: 42200, 
           previous: 36000,
-          goal: 50000
+          goal: 50000,
+          comparison: Math.round(((42200 - 36000) / 36000) * 100)
         },
         { 
           name: 'Serviços', 
           current: 36300, 
           previous: 28800,
-          goal: 42000
+          goal: 42000,
+          comparison: Math.round(((36300 - 28800) / 28800) * 100)
         },
       ],
       ticketChart: [

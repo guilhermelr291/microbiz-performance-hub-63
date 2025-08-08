@@ -13,6 +13,7 @@ interface KpiChartProps {
     current: number;
     previous?: number;
     goal?: number;
+    comparison?: number;
   }[];
   type?: 'line' | 'bar';
   comparison?: number;
@@ -145,7 +146,7 @@ const KpiChart = ({
           ) : (
             <BarChart
               data={data}
-              margin={{ top: 5, right: 10, left: 10, bottom: 40 }}
+              margin={{ top: 40, right: 10, left: 10, bottom: 40 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
@@ -163,9 +164,28 @@ const KpiChart = ({
               <Tooltip 
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
+                    const dataItem = data.find(item => item.name === label);
                     return (
                       <div className="bg-background border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
                         <p className="font-medium text-foreground mb-2">{label}</p>
+                        {dataItem?.comparison !== undefined && (
+                          <div className={`flex items-center rounded-md px-2 py-1 text-xs font-semibold mb-2 ${
+                            dataItem.comparison > 0 
+                              ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400' 
+                              : dataItem.comparison === 0 
+                                ? 'bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                                : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400'
+                          }`}>
+                            {dataItem.comparison > 0 ? (
+                              <ArrowUp className="mr-1 h-3 w-3" />
+                            ) : dataItem.comparison === 0 ? (
+                              <Minus className="mr-1 h-3 w-3" />
+                            ) : (
+                              <ArrowDown className="mr-1 h-3 w-3" />
+                            )}
+                            <span>{Math.abs(dataItem.comparison)}%</span>
+                          </div>
+                        )}
                         {payload.map((entry, index) => (
                           <div key={index} className="flex items-center justify-between mb-1">
                             <div className="flex items-center">
@@ -199,6 +219,27 @@ const KpiChart = ({
               {data.some(item => item.goal !== undefined) && (
                 <Bar dataKey="goal" fill={chartColors.goal} name="Meta" radius={[4, 4, 0, 0]} />
               )}
+              {/* Render percentage labels */}
+              {data.map((item, index) => {
+                if (item.comparison !== undefined) {
+                  const isPositive = item.comparison > 0;
+                  const isNeutral = item.comparison === 0;
+                  return (
+                    <text
+                      key={`percentage-${index}`}
+                      x={index * (400 / data.length) + (400 / data.length) / 2}
+                      y={20}
+                      textAnchor="middle"
+                      fill={isPositive ? '#059669' : isNeutral ? '#6b7280' : '#dc2626'}
+                      fontSize="12"
+                      fontWeight="600"
+                    >
+                      {isPositive ? '+' : ''}{item.comparison}%
+                    </text>
+                  );
+                }
+                return null;
+              })}
             </BarChart>
           )}
         </ResponsiveContainer>
