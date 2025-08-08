@@ -34,8 +34,8 @@ const FunnelStage = ({ label, value, previousValue, colorClass, width, conversio
   <div className="flex items-center w-full gap-4 animate-fade-in">
     <div className="relative w-full">
       <div 
-        style={{ width }}
-        className={`h-16 md:h-20 flex items-center justify-center rounded-lg shadow-lg ring-1 ring-border ${colorClass}`}
+        style={{ width, clipPath: 'polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%)' }}
+        className={`h-16 md:h-20 flex items-center justify-center rounded-md shadow-lg ring-1 ring-border overflow-hidden ${colorClass}`}
       >
         <div className="text-center">
           <div className="text-sm md:text-base font-medium">{label}</div>
@@ -69,7 +69,7 @@ const FunnelChart = ({ data, title, subtitle }: FunnelChartProps) => {
   const colorClasses = [
     "bg-gradient-to-r from-primary/90 to-primary text-primary-foreground",
     "bg-gradient-to-r from-accent/90 to-accent text-accent-foreground",
-    "bg-gradient-to-r from-secondary/90 to-secondary text-secondary-foreground",
+    "bg-gradient-to-r from-destructive/90 to-destructive text-destructive-foreground",
   ];
   
   const getConversionRate = (currentIndex: number) => {
