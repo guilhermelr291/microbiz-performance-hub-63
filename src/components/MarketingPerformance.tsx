@@ -38,9 +38,9 @@ const getMarketingData = (period: Period, dateRange?: DateRange, goals?: any) =>
     const leadsMeetings = Math.round(155 * scaleFactor);
     const sales = Math.round(95 * scaleFactor);
     const goalInvestment = Math.round((goals?.marketing || 5000) * scaleFactor);
-    const goalLeadsGenerated = Math.round((goals?.leadsGenerated || 250) * scaleFactor);
-    const goalMeetings = Math.round((goals?.leadsMeetings || 175) * scaleFactor);
-    const goalSales = Math.round((goals?.marketingSales || 120) * scaleFactor);
+    const goalLeadsGenerated = Math.round((goals?.leadsGenerated || 260) * scaleFactor);
+    const goalMeetings = Math.round((goals?.leadsMeetings || 170) * scaleFactor);
+    const goalSales = Math.round((goals?.marketingSales || 105) * scaleFactor);
     
     return {
       investment,
@@ -78,10 +78,10 @@ const getMarketingData = (period: Period, dateRange?: DateRange, goals?: any) =>
       goalLeadsGenerated,
       goalMeetings,
       goalSales,
-      goalCpl: goals?.cpl || 17,
-      goalLeadMeetingRate: goals?.leadToMeetingRate || 70,
-      goalMeetingSaleRate: goals?.meetingToSaleRate || 68.6,
-      goalRoas: goals?.roas || 6.5
+      goalCpl: goals?.cpl || 19.25,
+      goalLeadMeetingRate: goals?.leadToMeetingRate || 65.4,
+      goalMeetingSaleRate: goals?.meetingToSaleRate || 61.8,
+      goalRoas: goals?.roas || 6.0
     };
   } else {
     return {
@@ -152,13 +152,13 @@ const getMarketingData = (period: Period, dateRange?: DateRange, goals?: any) =>
         { name: 'Mês', current: 5.59, previous: 4.79 },
       ],
       goalInvestment: goals?.marketing || 5000,
-      goalLeadsGenerated: goals?.leadsGenerated || 250,
-      goalMeetings: goals?.leadsMeetings || 175,
-      goalSales: goals?.marketingSales || 120,
-      goalCpl: goals?.cpl || 17,
-      goalLeadMeetingRate: goals?.leadToMeetingRate || 70,
-      goalMeetingSaleRate: goals?.meetingToSaleRate || 68.6,
-      goalRoas: goals?.roas || 6.5
+      goalLeadsGenerated: goals?.leadsGenerated || 260,
+      goalMeetings: goals?.leadsMeetings || 170,
+      goalSales: goals?.marketingSales || 105,
+      goalCpl: goals?.cpl || 19.25,
+      goalLeadMeetingRate: goals?.leadToMeetingRate || 65.4,
+      goalMeetingSaleRate: goals?.meetingToSaleRate || 61.8,
+      goalRoas: goals?.roas || 6.0
     };
   }
 };

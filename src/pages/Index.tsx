@@ -110,25 +110,7 @@ const Index = () => {
   const { goals } = useGoals();
   const generalData = getGeneralData(dateRange, goals);
 
-  const calculateAdjustedGoal = (monthlyGoal: number, dateRange: DateRange) => {
-    const daysDiff = Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const daysInMonth = 30;
-    return Math.round((monthlyGoal / daysInMonth) * daysDiff);
-  };
 
-  // Adjust goals based on the selected date range
-  useEffect(() => {
-    const adjustedSalesGoal = calculateAdjustedGoal(85000, dateRange);
-    const adjustedCustomersGoal = calculateAdjustedGoal(300, dateRange);
-    const adjustedMarketingGoal = calculateAdjustedGoal(5000, dateRange);
-
-    // In a real application, we would update the goals state here
-    console.log('Adjusted goals:', {
-      sales: adjustedSalesGoal,
-      customers: adjustedCustomersGoal,
-      marketing: adjustedMarketingGoal
-    });
-  }, [dateRange]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
