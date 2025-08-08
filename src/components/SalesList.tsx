@@ -41,6 +41,8 @@ export async function fetchSalesApi(params?: {
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
+const getSaleFilial = (s: Sale): number => (typeof s.filial === 'number' ? s.filial : (((typeof s.id === 'number' ? s.id : 0) % 3) + 1));
+
 const mockSales: Sale[] = [
   { id: 1, dataVenda: '2025-08-01', codigo: 'PD-2001', descricao: 'Produto A', quantidade: 2, valorUnitario: 150.5, valorTotal: 301.0, cliente: 'Maria Silva', cpf: '123.456.789-00', dataCadastro: '2025-08-01', status: 'concluída', tipo: 'produto' },
   { id: 2, dataVenda: '2025-08-02', codigo: 'SV-3001', descricao: 'Serviço de Consultoria', quantidade: 1, valorUnitario: 1200, valorTotal: 1200, cliente: 'Empresa XYZ Ltda', cpf: '12.345.678/0001-99', dataCadastro: '2025-08-02', status: 'concluída', tipo: 'serviço' },
@@ -96,7 +98,8 @@ const SalesList = () => {
   const [period, setPeriod] = useState<'mes' | 'ultimos7' | 'custom'>('mes');
   const [dateRange, setDateRange] = useState<DateRange>(getCurrentMonthRange());
   const [descricao, setDescricao] = useState('');
-  const [tipo, setTipo] = useState<'todos' | SaleType>('todos');
+const [tipo, setTipo] = useState<'todos' | SaleType>('todos');
+  const [filial, setFilial] = useState<'todas' | number>('todas');
 
   const effectiveRange = useMemo(() => {
     if (period === 'mes') return getCurrentMonthRange();
@@ -104,7 +107,7 @@ const SalesList = () => {
     return dateRange;
   }, [period, dateRange]);
 
-  const rows = useMemo(() => {
+const rows = useMemo(() => {
     const start = new Date(effectiveRange.startDate);
     const end = new Date(effectiveRange.endDate);
     end.setHours(23, 59, 59, 999);
@@ -116,9 +119,10 @@ const SalesList = () => {
         ? s.descricao.toLowerCase().includes(descricao.toLowerCase())
         : true;
       const matchesType = tipo === 'todos' ? true : s.tipo === tipo;
-      return inRange && matchesDesc && matchesType;
+      const matchesFilial = filial === 'todas' ? true : getSaleFilial(s) === filial;
+      return inRange && matchesDesc && matchesType && matchesFilial;
     });
-  }, [effectiveRange, descricao, tipo]);
+  }, [effectiveRange, descricao, tipo, filial]);
 
   const dataToExport = useMemo(() => rows.map((s) => ({
     'Data da Venda': new Date(s.dataVenda).toLocaleDateString('pt-BR'),
@@ -154,7 +158,7 @@ const SalesList = () => {
             </Button>
           </div>
           {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1">Período</label>
               <Select value={period} onValueChange={(v) => setPeriod(v as any)}>
@@ -198,6 +202,21 @@ const SalesList = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Filial</label>
+              <Select value={String(filial)} onValueChange={(v) => setFilial(v === 'todas' ? 'todas' : Number(v))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filial" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  <SelectItem value="1">Filial 1</SelectItem>
+                  <SelectItem value="2">Filial 2</SelectItem>
+                  <SelectItem value="3">Filial 3</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Tabela */}
@@ -224,7 +243,7 @@ const SalesList = () => {
                   <TableRow key={s.id}>
                     <TableCell>{new Date(s.dataVenda).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell>{s.codigo}</TableCell>
-                    <TableCell>{typeof s.filial === 'number' ? s.filial : (((typeof s.id === 'number' ? s.id : 0) % 3) + 1)}</TableCell>
+                    <TableCell>{getSaleFilial(s)}</TableCell>
                     <TableCell>{s.descricao}</TableCell>
                     <TableCell className="text-right">{s.quantidade}</TableCell>
                     <TableCell className="text-right">{currency.format(s.valorUnitario)}</TableCell>
