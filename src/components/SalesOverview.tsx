@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Grid } from '@/components/ui/grid';
 import ComparisonCard from '@/components/ComparisonCard';
 import KpiChart from '@/components/KpiChart';
-import { DataAnalysis } from '@/components/DataAnalysis';
+import { SalesAnalysisCards } from '@/components/SalesAnalysisCards';
 import { Period, DateRange } from '@/types/metrics';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -216,18 +216,15 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
         />
       </div>
 
-      <DataAnalysis 
-        title="Análise dos Números - Vendas" 
-        data={{
-          type: "sales",
-          metrics: {
-            totalRevenue: data.totalRevenue,
-            revenueComparison: data.revenueComparison,
-            productRevenue: data.productRevenue,
-            serviceRevenue: data.serviceRevenue,
-            ticketAverage: data.ticketAverage,
-            goalValue: data.goalValue
-          }
+      <SalesAnalysisCards 
+        metrics={{
+          totalRevenue: data.totalRevenue,
+          revenueComparison: data.revenueComparison,
+          productRevenue: data.productRevenue,
+          serviceRevenue: data.serviceRevenue,
+          ticketAverage: data.ticketAverage,
+          ticketComparison: data.ticketComparison,
+          goalValue: data.goalValue
         }}
       />
     </>
