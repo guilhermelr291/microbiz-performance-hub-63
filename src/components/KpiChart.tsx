@@ -42,9 +42,9 @@ const KpiChart = ({
   const isNeutral = comparison && comparison === 0;
   
   const [chartColors, setChartColors] = useState({
-    current: '#8884d8',
-    previous: '#82ca9d',
-    goal: '#ff7300'
+    current: '#ff7300', // laranja
+    previous: '#3b82f6', // azul
+    goal: '#8884d8'
   });
 
   // Update to handle weekly goals instead of daily
@@ -145,12 +145,18 @@ const KpiChart = ({
                 formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
                 labelFormatter={(label) => `Semana: ${label}`}
               />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                iconType="line"
+                wrapperStyle={{ paddingTop: '20px' }}
+              />
               <Line 
                 type="monotone" 
                 dataKey="current" 
                 stroke={chartColors.current} 
-                strokeWidth={2} 
-                dot={{ r: 4 }} 
+                strokeWidth={4} 
+                dot={{ r: 6, strokeWidth: 2 }} 
                 name="Atual"
               />
               {data.some(item => item.previous !== undefined) && (
@@ -158,10 +164,10 @@ const KpiChart = ({
                   type="monotone" 
                   dataKey="previous" 
                   stroke={chartColors.previous} 
-                  strokeWidth={2} 
-                  dot={{ r: 4 }}
+                  strokeWidth={4} 
+                  dot={{ r: 6, strokeWidth: 2 }}
                   name="Anterior" 
-                  strokeDasharray="3 3"
+                  strokeDasharray="8 4"
                 />
               )}
               {(goalValue || data.some(item => item.goal !== undefined)) && (
@@ -169,10 +175,10 @@ const KpiChart = ({
                   type="monotone"
                   dataKey="goal"
                   stroke={chartColors.goal}
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
+                  strokeWidth={4}
+                  dot={{ r: 6, strokeWidth: 2 }}
                   name="Meta"
-                  strokeDasharray="5 5"
+                  strokeDasharray="12 6"
                 />
               )}
             </LineChart>
