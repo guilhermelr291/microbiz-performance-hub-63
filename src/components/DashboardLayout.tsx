@@ -21,7 +21,7 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <Sidebar className="border-r">
-          <SidebarHeader className="border-b p-4">
+          <SidebarHeader className="border-b p-4 h-14 flex items-center">
             <div className="flex items-center">
               <BarChart className="h-6 w-6 text-primary mr-2" />
               <h1 className="text-xl font-bold">MicroBiz Hub</h1>
@@ -81,7 +81,7 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
           </SidebarFooter>
         </Sidebar>
         <div className="flex-1">
-          <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
+          <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4 h-14">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <h2 className="text-lg font-semibold">{headerTitle || 'Dashboard'}</h2>
