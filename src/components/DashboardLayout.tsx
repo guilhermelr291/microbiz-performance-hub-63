@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, BarChart, Users, DollarSign, Settings, LogOut } from 'lucide-react';
+import { CalendarDays, BarChart, Users, DollarSign, Settings, LogOut, Shield } from 'lucide-react';
 import { ThemeToggle } from './ThemeProvider';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,6 +45,12 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
                 <NavLink to="/clientes" className="flex items-center">
                   <Users className="mr-2 h-4 w-4" />
                   <span>Clientes</span>
+                </NavLink>
+              </Button>
+              <Button variant="sidebar" className="w-full justify-start" asChild>
+                <NavLink to="/admin" className="flex items-center">
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Super Adm</span>
                 </NavLink>
               </Button>
               <Button variant="sidebar" className="w-full justify-start" asChild>
