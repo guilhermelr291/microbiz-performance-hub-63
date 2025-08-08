@@ -1,35 +1,59 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import * as XLSX from 'xlsx';
+import api from '@/services/api';
+
 export type CustomerStatus = 'ativo' | 'inativo';
 
 export interface Customer {
-  id: string | number;
+  id: number;
   nome: string;
-  documento: string; // CPF ou CNPJ
-  dataCadastro: string; // ISO date string
+  documento: string;
+  dataCadastro: string;
   status: CustomerStatus;
 }
 
-// Método pronto para integração com backend usando Axios
-// Quando o backend estiver disponível, use esta função para buscar os dados reais
-export async function fetchCustomersApi(): Promise<Customer[]> {
-  const response = await axios.get('/api/clientes');
-  return response.data as Customer[];
+interface ApiCustomer {
+  id: number;
+  name: string;
+  taxId: string | null;
+  status: 'ACTIVE' | 'INACTIVE';
+  createdAt: string;
 }
 
-const mockCustomers: Customer[] = [
-  { id: 1, nome: 'Maria Silva', documento: '123.456.789-00', dataCadastro: '2024-05-12', status: 'ativo' },
-  { id: 2, nome: 'Empresa XYZ Ltda', documento: '12.345.678/0001-99', dataCadastro: '2024-03-28', status: 'inativo' },
-  { id: 3, nome: 'João Pereira', documento: '987.654.321-00', dataCadastro: '2024-07-01', status: 'ativo' },
-  { id: 4, nome: 'Comércio Alfa ME', documento: '45.678.912/0001-10', dataCadastro: '2024-01-15', status: 'ativo' },
-  { id: 5, nome: 'Ana Costa', documento: '321.654.987-00', dataCadastro: '2024-02-09', status: 'inativo' },
-];
+export async function fetchCustomersApi(): Promise<ApiCustomer[]> {
+  const response = await api.get('/customers');
+  console.log('response.data', response.data);
+  return response.data as ApiCustomer[];
+}
+
+const mapApiCustomerToCustomer = (apiCustomer: ApiCustomer): Customer => ({
+  id: apiCustomer.id,
+  nome: apiCustomer.name,
+  documento: apiCustomer.taxId || '',
+  dataCadastro: apiCustomer.createdAt,
+  status: apiCustomer.status === 'ACTIVE' ? 'ativo' : 'inativo',
+});
 
 const StatusPill = ({ status }: { status: CustomerStatus }) => {
   const isActive = status === 'ativo';
@@ -48,22 +72,46 @@ const StatusPill = ({ status }: { status: CustomerStatus }) => {
 };
 
 const CustomersList = () => {
-  const [customers] = useState<Customer[]>(mockCustomers);
+  const [customers, setCustomers] = useState<Customer[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [nome, setNome] = useState('');
   const [documento, setDocumento] = useState('');
 
   const PER_PAGE = 100;
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const apiCustomers = await fetchCustomersApi();
+        const mappedCustomers = apiCustomers.map(mapApiCustomerToCustomer);
+        setCustomers(mappedCustomers);
+      } catch (error) {
+        console.error('Erro ao buscar clientes:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const rows = useMemo(() => {
-    const normalize = (s: string) => s.normalize('NFD').replace(/[^\w\s]/g, '').replace(/[\u0300-\u036f]/g, '');
+    if (!customers) return [];
+    const normalize = (s: string) =>
+      s
+        .normalize('NFD')
+        .replace(/[^\w\s]/g, '')
+        .replace(/[\u0300-\u036f]/g, '');
     const onlyDigits = (s: string) => s.replace(/\D/g, '');
 
     const filtroNome = normalize(nome.toLowerCase());
     const filtroDoc = onlyDigits(documento);
 
-    return customers.filter((c) => {
-      const nomeMatch = filtroNome ? normalize(c.nome.toLowerCase()).includes(filtroNome) : true;
+    return customers.filter(c => {
+      const nomeMatch = filtroNome
+        ? normalize(c.nome.toLowerCase()).includes(filtroNome)
+        : true;
       const docDigits = onlyDigits(c.documento);
       const docMatch = filtroDoc ? docDigits.includes(filtroDoc) : true;
       return nomeMatch && docMatch;
@@ -71,25 +119,41 @@ const CustomersList = () => {
   }, [customers, nome, documento]);
 
   const totalPages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
-  const paginatedRows = useMemo(() => rows.slice((page - 1) * PER_PAGE, page * PER_PAGE), [rows, page]);
+  const paginatedRows = useMemo(
+    () => rows.slice((page - 1) * PER_PAGE, page * PER_PAGE),
+    [rows, page]
+  );
 
-  useEffect(() => { setPage(1); }, [nome, documento]);
+  useEffect(() => {
+    setPage(1);
+  }, [nome, documento]);
 
-  const dataToExport = useMemo(() =>
-    rows.map((c) => ({
-      'Nome': c.nome,
-      'CPF/CNPJ': c.documento,
-      'Data de Cadastro': new Date(c.dataCadastro).toLocaleDateString('pt-BR'),
-      'Status': c.status === 'ativo' ? 'Ativo' : 'Inativo',
-    })),
-  [rows]);
+  const dataToExport = useMemo(
+    () =>
+      rows.map(c => ({
+        Nome: c.nome,
+        'CPF/CNPJ': c.documento,
+        'Data de Cadastro': new Date(c.dataCadastro).toLocaleDateString(
+          'pt-BR'
+        ),
+        Status: c.status === 'ativo' ? 'Ativo' : 'Inativo',
+      })),
+    [rows]
+  );
 
   const handleExport = () => {
     const ws = XLSX.utils.json_to_sheet(dataToExport);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
-    XLSX.writeFile(wb, `clientes_${new Date().toISOString().slice(0,10)}.xlsx`);
+    XLSX.writeFile(
+      wb,
+      `clientes_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <section className="w-full">
@@ -99,7 +163,11 @@ const CustomersList = () => {
         </CardHeader>
         <CardContent>
           <div className="flex justify-end mb-3">
-            <Button variant="secondary" onClick={handleExport} aria-label="Exportar lista de clientes para Excel">
+            <Button
+              variant="secondary"
+              onClick={handleExport}
+              aria-label="Exportar lista de clientes para Excel"
+            >
               Exportar Excel
             </Button>
           </div>
@@ -109,7 +177,7 @@ const CustomersList = () => {
               <Input
                 placeholder="Filtrar por nome"
                 value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                onChange={e => setNome(e.target.value)}
               />
             </div>
             <div>
@@ -117,7 +185,7 @@ const CustomersList = () => {
               <Input
                 placeholder="Filtrar por CPF/CNPJ"
                 value={documento}
-                onChange={(e) => setDocumento(e.target.value)}
+                onChange={e => setDocumento(e.target.value)}
               />
             </div>
           </div>
@@ -132,7 +200,7 @@ const CustomersList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedRows.map((c) => (
+                {paginatedRows.map(c => (
                   <TableRow key={c.id}>
                     <TableCell>{c.nome}</TableCell>
                     <TableCell>{c.documento}</TableCell>
@@ -146,18 +214,40 @@ const CustomersList = () => {
                 ))}
               </TableBody>
             </Table>
+            {rows.length === 0 && (
+              <p className="text-center text-muted-foreground mt-4">
+                Nenhum cliente encontrado.
+              </p>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3">
-            <p className="text-xs text-muted-foreground">Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, rows.length)} de {rows.length}</p>
+            <p className="text-xs text-muted-foreground">
+              Mostrando {(page - 1) * PER_PAGE + 1}–
+              {Math.min(page * PER_PAGE, rows.length)} de {rows.length}
+            </p>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, page - 1)); }} />
+                  <PaginationPrevious
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
+                      setPage(Math.max(1, page - 1));
+                    }}
+                  />
                 </PaginationItem>
                 {page > 2 && (
                   <>
                     <PaginationItem>
-                      <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(1); }}>1</PaginationLink>
+                      <PaginationLink
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          setPage(1);
+                        }}
+                      >
+                        1
+                      </PaginationLink>
                     </PaginationItem>
                     {page > 3 && (
                       <PaginationItem>
@@ -166,11 +256,22 @@ const CustomersList = () => {
                     )}
                   </>
                 )}
-                {[page - 1, page, page + 1].filter(p => p >= 1 && p <= totalPages).map(p => (
-                  <PaginationItem key={p}>
-                    <PaginationLink href="#" isActive={p === page} onClick={(e) => { e.preventDefault(); setPage(p); }}>{p}</PaginationLink>
-                  </PaginationItem>
-                ))}
+                {[page - 1, page, page + 1]
+                  .filter(p => p >= 1 && p <= totalPages)
+                  .map(p => (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        href="#"
+                        isActive={p === page}
+                        onClick={e => {
+                          e.preventDefault();
+                          setPage(p);
+                        }}
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                 {page < totalPages - 1 && (
                   <>
                     {page < totalPages - 2 && (
@@ -179,12 +280,26 @@ const CustomersList = () => {
                       </PaginationItem>
                     )}
                     <PaginationItem>
-                      <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(totalPages); }}>{totalPages}</PaginationLink>
+                      <PaginationLink
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          setPage(totalPages);
+                        }}
+                      >
+                        {totalPages}
+                      </PaginationLink>
                     </PaginationItem>
                   </>
                 )}
                 <PaginationItem>
-                  <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, page + 1)); }} />
+                  <PaginationNext
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
+                      setPage(Math.min(totalPages, page + 1));
+                    }}
+                  />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
