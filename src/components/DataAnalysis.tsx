@@ -37,30 +37,30 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
     if (goalValue) {
       const goalPercentage = ((totalRevenue / goalValue) * 100).toFixed(1);
       if (totalRevenue >= goalValue) {
-        analysis += `O faturamento total de R$${totalRevenue.toLocaleString('pt-BR')} atingiu ${goalPercentage}% da meta estabelecida (R$${goalValue.toLocaleString('pt-BR')}), demonstrando excelente performance comercial. `;
+        analysis += `💰 **Faturamento Total:**\nR$ **${totalRevenue.toLocaleString('pt-BR')}**, representando **${goalPercentage}%** da meta estabelecida (R$ ${goalValue.toLocaleString('pt-BR')}), demonstrando **excelente performance comercial**.\n\n`;
       } else {
-        analysis += `O faturamento total de R$${totalRevenue.toLocaleString('pt-BR')} representa ${goalPercentage}% da meta estabelecida (R$${goalValue.toLocaleString('pt-BR')}). `;
+        analysis += `💰 **Faturamento Total:**\nR$ **${totalRevenue.toLocaleString('pt-BR')}**, representando **${goalPercentage}%** da meta estabelecida (R$ **${goalValue.toLocaleString('pt-BR')}**).\n\n`;
       }
     }
     
     // Analyze period-to-period comparison
     if (revenueComparison > 15) {
-      analysis += `O faturamento total apresenta crescimento significativo de ${revenueComparison}% em relação ao período anterior, indicando forte desempenho comercial. `;
+      analysis += `📈 **Crescimento:**\nAumento significativo de **${revenueComparison}%** em relação ao período anterior, demonstrando **forte desempenho comercial**.\n\n`;
     } else if (revenueComparison > 0) {
-      analysis += `O faturamento total apresenta crescimento moderado de ${revenueComparison}% em relação ao período anterior. `;
+      analysis += `📈 **Crescimento:**\nAumento moderado de **${revenueComparison}%** em relação ao período anterior.\n\n`;
     } else if (revenueComparison < 0) {
-      analysis += `O faturamento total apresenta queda de ${Math.abs(revenueComparison)}% em relação ao período anterior, o que merece atenção. `;
+      analysis += `📉 **Variação:**\nQueda de **${Math.abs(revenueComparison)}%** em relação ao período anterior, o que **merece atenção**.\n\n`;
     }
     
     // Analyze product vs service revenue
     if (productRevenue > serviceRevenue) {
-      analysis += `A maior parte do faturamento vem da venda de produtos (R$${productRevenue.toLocaleString('pt-BR')}), que representa ${((productRevenue / totalRevenue) * 100).toFixed(1)}% do total. `;
+      analysis += `📦 **Faturamento em Produtos:**\nR$ **${productRevenue.toLocaleString('pt-BR')}**, o que representa **${((productRevenue / totalRevenue) * 100).toFixed(1)}%** do total faturado.\n\n`;
     } else {
-      analysis += `A maior parte do faturamento vem da prestação de serviços (R$${serviceRevenue.toLocaleString('pt-BR')}), que representa ${((serviceRevenue / totalRevenue) * 100).toFixed(1)}% do total. `;
+      analysis += `🛠️ **Faturamento em Serviços:**\nR$ **${serviceRevenue.toLocaleString('pt-BR')}**, o que representa **${((serviceRevenue / totalRevenue) * 100).toFixed(1)}%** do total faturado.\n\n`;
     }
     
     if (ticketAverage) {
-      analysis += `O ticket médio de R$${ticketAverage.toLocaleString('pt-BR')} é um indicador importante para avaliar o valor médio das transações. `;
+      analysis += `💳 **Ticket Médio:**\nR$ **${ticketAverage.toLocaleString('pt-BR')}** – um indicador relevante para entender o **valor médio das transações**.\n\n`;
     }
     
     return analysis;
@@ -79,32 +79,32 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
     if (goalCustomersServed) {
       const goalPercentage = ((customersServed / goalCustomersServed) * 100).toFixed(1);
       if (customersServed >= goalCustomersServed) {
-        analysis += `O número de ${customersServed} clientes atendidos atingiu ${goalPercentage}% da meta estabelecida (${goalCustomersServed}), demonstrando excelente capacidade de atendimento. `;
+        analysis += `👥 **Clientes Atendidos:**\n**${customersServed}** clientes atendidos, atingindo **${goalPercentage}%** da meta estabelecida (**${goalCustomersServed}**), demonstrando **excelente capacidade de atendimento**.\n\n`;
       } else {
-        analysis += `O número de ${customersServed} clientes atendidos representa ${goalPercentage}% da meta estabelecida (${goalCustomersServed}). `;
+        analysis += `👥 **Clientes Atendidos:**\n**${customersServed}** clientes atendidos, representando **${goalPercentage}%** da meta estabelecida (**${goalCustomersServed}**).\n\n`;
       }
     }
     
     // Analyze period-to-period comparison
     if (customersComparison > 15) {
-      analysis += `O número de clientes atendidos aumentou significativamente (${customersComparison}% a mais que o período anterior), demonstrando crescimento da base de clientes. `;
+      analysis += `📈 **Crescimento da Base:**\nAumento significativo de **${customersComparison}%** no número de clientes atendidos, demonstrando **crescimento da base de clientes**.\n\n`;
     } else if (customersComparison > 0) {
-      analysis += `Houve um aumento de ${customersComparison}% no número de clientes atendidos em comparação ao período anterior. `;
+      analysis += `📈 **Variação Positiva:**\nAumento de **${customersComparison}%** no número de clientes atendidos em comparação ao período anterior.\n\n`;
     } else if (customersComparison < 0) {
-      analysis += `Houve uma redução de ${Math.abs(customersComparison)}% no número de clientes atendidos em comparação ao período anterior, o que pode indicar problemas de retenção. `;
+      analysis += `📉 **Redução:**\nDiminuição de **${Math.abs(customersComparison)}%** no número de clientes atendidos, o que pode indicar **problemas de retenção**.\n\n`;
     }
     
     // Analyze new customers
     if (newCustomers) {
       const newCustomersPercentage = ((newCustomers / customersServed) * 100).toFixed(1);
-      analysis += `Dos ${customersServed} clientes atendidos, ${newCustomers} são novos clientes, representando ${newCustomersPercentage}% do total. `;
+      analysis += `🆕 **Novos Clientes:**\n**${newCustomers}** novos clientes, representando **${newCustomersPercentage}%** do total de clientes atendidos.\n\n`;
       
       if (goalNewCustomers) {
         const goalNewCustomersPercentage = ((newCustomers / goalNewCustomers) * 100).toFixed(1);
         if (newCustomers >= goalNewCustomers) {
-          analysis += `A aquisição de novos clientes atingiu ${goalNewCustomersPercentage}% da meta estabelecida. `;
+          analysis += `🎯 **Meta de Aquisição:**\nA aquisição de novos clientes atingiu **${goalNewCustomersPercentage}%** da meta estabelecida.\n\n`;
         } else {
-          analysis += `A aquisição de novos clientes está em ${goalNewCustomersPercentage}% da meta estabelecida. `;
+          analysis += `🎯 **Meta de Aquisição:**\nA aquisição de novos clientes está em **${goalNewCustomersPercentage}%** da meta estabelecida.\n\n`;
         }
       }
     }
@@ -112,22 +112,22 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
     // Analyze products per client
     if (productsPerClient) {
       if (goalProductsPerClient && productsPerClient >= goalProductsPerClient) {
-        analysis += `A média de ${productsPerClient.toFixed(1)} produtos por cliente atingiu ou superou a meta de ${goalProductsPerClient.toFixed(1)}, indicando excelente desempenho em cross-selling. `;
+        analysis += `📦 **Produtos por Cliente:**\nMédia de **${productsPerClient.toFixed(1)}** produtos por cliente, **atingindo a meta** de **${goalProductsPerClient.toFixed(1)}**, indicando excelente desempenho em cross-selling.\n\n`;
       } else if (productsPerClient > 1.5) {
-        analysis += `A média de ${productsPerClient.toFixed(1)} produtos por cliente indica bom desempenho em cross-selling. `;
+        analysis += `📦 **Produtos por Cliente:**\nMédia de **${productsPerClient.toFixed(1)}** produtos por cliente, indicando **bom desempenho em cross-selling**.\n\n`;
       } else {
-        analysis += `A média de ${productsPerClient.toFixed(1)} produtos por cliente sugere oportunidade para melhorar estratégias de cross-selling. `;
+        analysis += `📦 **Produtos por Cliente:**\nMédia de **${productsPerClient.toFixed(1)}** produtos por cliente, com **oportunidade para melhorar** estratégias de cross-selling.\n\n`;
       }
     }
     
     // Analyze services per client
     if (servicesPerClient) {
       if (goalServicesPerClient && servicesPerClient >= goalServicesPerClient) {
-        analysis += `A média de ${servicesPerClient.toFixed(1)} serviços por cliente atingiu ou superou a meta de ${goalServicesPerClient.toFixed(1)}, indicando excelente engajamento do cliente. `;
+        analysis += `🛠️ **Serviços por Cliente:**\nMédia de **${servicesPerClient.toFixed(1)}** serviços por cliente, **superando a meta** de **${goalServicesPerClient.toFixed(1)}**, indicando excelente engajamento.\n\n`;
       } else if (servicesPerClient > 2) {
-        analysis += `A média de ${servicesPerClient.toFixed(1)} serviços por cliente é positiva e sugere bom engajamento. `;
+        analysis += `🛠️ **Serviços por Cliente:**\nMédia de **${servicesPerClient.toFixed(1)}** serviços por cliente, indicando **bom engajamento** do cliente.\n\n`;
       } else {
-        analysis += `A média de ${servicesPerClient.toFixed(1)} serviços por cliente pode ser melhorada com novas estratégias de upselling. `;
+        analysis += `🛠️ **Serviços por Cliente:**\nMédia de **${servicesPerClient.toFixed(1)}** serviços por cliente, com **potencial para melhorar** com novas estratégias de upselling.\n\n`;
       }
     }
     
@@ -145,67 +145,67 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
     let analysis = "";
     
     // Analyze marketing investment
-    analysis += `Com um investimento de R$${investment.toLocaleString('pt-BR')} em marketing, foram gerados ${leadsGenerated} leads, resultando em um custo por lead (CPL) de R$${cpl.toFixed(2)}. `;
+    analysis += `💰 **Investimento em Marketing:**\nR$ **${investment.toLocaleString('pt-BR')}** investidos, gerando **${leadsGenerated}** leads, com custo por lead (CPL) de R$ **${cpl.toFixed(2)}**.\n\n`;
     
     // Analyze CPL
     if (goalCpl) {
       if (cpl <= goalCpl) {
-        analysis += `O CPL atual está abaixo ou igual à meta de R$${goalCpl.toFixed(2)}, demonstrando eficiência na aquisição de leads. `;
+        analysis += `🎯 **CPL vs Meta:**\nO CPL atual está **dentro da meta** de R$ **${goalCpl.toFixed(2)}**, demonstrando **eficiência na aquisição** de leads.\n\n`;
       } else {
-        analysis += `O CPL atual está acima da meta de R$${goalCpl.toFixed(2)}, indicando oportunidade para otimizar os investimentos em aquisição. `;
+        analysis += `⚠️ **CPL vs Meta:**\nO CPL atual está **acima da meta** de R$ **${goalCpl.toFixed(2)}**, indicando **oportunidade para otimizar** os investimentos em aquisição.\n\n`;
       }
     }
     
     // Analyze lead to meeting conversion
     if (leadToMeetingRate > 60) {
-      analysis += `A taxa de conversão de leads para atendimentos de ${leadToMeetingRate}% está acima da média do mercado, indicando qualificação eficiente dos leads. `;
+      analysis += `📞 **Conversão Lead → Atendimento:**\nTaxa de **${leadToMeetingRate}%** está **acima da média do mercado**, indicando **qualificação eficiente** dos leads.\n\n`;
     } else if (leadToMeetingRate < 40) {
-      analysis += `A taxa de conversão de leads para atendimentos de ${leadToMeetingRate}% está abaixo do ideal, sugerindo necessidade de melhor qualificação dos leads. `;
+      analysis += `📞 **Conversão Lead → Atendimento:**\nTaxa de **${leadToMeetingRate}%** está **abaixo do ideal**, sugerindo necessidade de **melhor qualificação** dos leads.\n\n`;
     } else {
-      analysis += `A taxa de conversão de leads para atendimentos é de ${leadToMeetingRate}%, dentro do esperado. `;
+      analysis += `📞 **Conversão Lead → Atendimento:**\nTaxa de **${leadToMeetingRate}%** está **dentro do esperado**.\n\n`;
     }
     
     if (goalLeadToMeetingRate) {
       if (leadToMeetingRate >= goalLeadToMeetingRate) {
-        analysis += `Esta taxa superou a meta estabelecida de ${goalLeadToMeetingRate}%. `;
+        analysis += `✅ **Meta de Conversão:**\nEsta taxa **superou a meta** estabelecida de **${goalLeadToMeetingRate}%**.\n\n`;
       } else {
-        analysis += `Esta taxa está abaixo da meta estabelecida de ${goalLeadToMeetingRate}%. `;
+        analysis += `⚡ **Meta de Conversão:**\nEsta taxa está **abaixo da meta** estabelecida de **${goalLeadToMeetingRate}%**.\n\n`;
       }
     }
     
     // Analyze meeting to sale conversion
     if (meetingToSaleRate > 50) {
-      analysis += `A taxa de conversão de atendimentos para vendas de ${meetingToSaleRate}% é excelente, demonstrando eficácia no processo de vendas. `;
+      analysis += `💼 **Conversão Atendimento → Venda:**\nTaxa de **${meetingToSaleRate}%** é **excelente**, demonstrando **eficácia no processo de vendas**.\n\n`;
     } else {
-      analysis += `A taxa de conversão de atendimentos para vendas é de ${meetingToSaleRate}%, sugerindo oportunidades para melhorar o processo de fechamento. `;
+      analysis += `💼 **Conversão Atendimento → Venda:**\nTaxa de **${meetingToSaleRate}%** sugere **oportunidades para melhorar** o processo de fechamento.\n\n`;
     }
     
     if (goalMeetingToSaleRate) {
       if (meetingToSaleRate >= goalMeetingToSaleRate) {
-        analysis += `Esta taxa superou a meta estabelecida de ${goalMeetingToSaleRate}%. `;
+        analysis += `🏆 **Performance de Vendas:**\nEsta taxa **superou a meta** estabelecida de **${goalMeetingToSaleRate}%**.\n\n`;
       } else {
-        analysis += `Esta taxa está abaixo da meta estabelecida de ${goalMeetingToSaleRate}%. `;
+        analysis += `🎯 **Performance de Vendas:**\nEsta taxa está **abaixo da meta** estabelecida de **${goalMeetingToSaleRate}%**.\n\n`;
       }
     }
     
     // Analyze ROAS
     if (goalRoas) {
       if (roas >= goalRoas) {
-        analysis += `O ROAS de ${roas.toFixed(2)}x superou a meta estabelecida de ${goalRoas.toFixed(2)}x, indicando excelente retorno sobre investimento em marketing. `;
+        analysis += `📈 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** superou a meta estabelecida de **${goalRoas.toFixed(2)}x**, indicando **excelente retorno** sobre investimento em marketing.\n\n`;
       } else if (roas >= 4) {
-        analysis += `O ROAS (Retorno sobre Investimento em Publicidade) de ${roas.toFixed(2)}x é muito positivo, mas ainda não atingiu a meta de ${goalRoas.toFixed(2)}x. `;
+        analysis += `📊 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** é muito positivo, mas ainda **não atingiu a meta** de **${goalRoas.toFixed(2)}x**.\n\n`;
       } else if (roas >= 2) {
-        analysis += `O ROAS de ${roas.toFixed(2)}x é satisfatório, mas está abaixo da meta de ${goalRoas.toFixed(2)}x. `;
+        analysis += `📊 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** é satisfatório, mas está **abaixo da meta** de **${goalRoas.toFixed(2)}x**.\n\n`;
       } else {
-        analysis += `O ROAS de ${roas.toFixed(2)}x está significativamente abaixo da meta de ${goalRoas.toFixed(2)}x, sugerindo necessidade urgente de revisão das estratégias de marketing. `;
+        analysis += `🚨 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** está **significativamente abaixo da meta** de **${goalRoas.toFixed(2)}x**, sugerindo **necessidade urgente** de revisão das estratégias.\n\n`;
       }
     } else {
       if (roas >= 4) {
-        analysis += `O ROAS (Retorno sobre Investimento em Publicidade) de ${roas.toFixed(2)}x é muito positivo, indicando excelente eficiência do investimento em marketing. `;
+        analysis += `📈 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** é **muito positivo**, indicando **excelente eficiência** do investimento em marketing.\n\n`;
       } else if (roas >= 2) {
-        analysis += `O ROAS de ${roas.toFixed(2)}x é satisfatório, indicando que o investimento em marketing está sendo recuperado adequadamente. `;
+        analysis += `📊 **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** é **satisfatório**, indicando que o investimento está sendo **recuperado adequadamente**.\n\n`;
       } else {
-        analysis += `O ROAS de ${roas.toFixed(2)}x está abaixo do ideal, sugerindo necessidade de revisão das estratégias de marketing para melhorar o retorno sobre investimento. `;
+        analysis += `⚠️ **ROAS (Retorno sobre Investimento):**\n**${roas.toFixed(2)}x** está **abaixo do ideal**, sugerindo necessidade de **revisão das estratégias** de marketing.\n\n`;
       }
     }
     
@@ -399,12 +399,17 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
   };
 
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
+    <Card className="mt-6 bg-white border border-border rounded-lg shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-bold text-foreground">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="whitespace-pre-line text-sm">
+      <CardContent className="pt-0">
+        <div 
+          className="whitespace-pre-line text-base leading-relaxed space-y-2 text-foreground"
+          style={{
+            lineHeight: '1.6',
+          }}
+        >
           {generateAnalysis()}
         </div>
       </CardContent>
