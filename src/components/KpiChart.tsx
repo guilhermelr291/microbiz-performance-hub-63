@@ -181,7 +181,7 @@ const KpiChart = ({
               data={data}
               margin={{ top: 40, right: 10, left: 10, bottom: 40 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" strokeWidth={1} />
               <XAxis 
                 dataKey="name" 
                 axisLine={false}
@@ -246,11 +246,32 @@ const KpiChart = ({
                 wrapperStyle={{ paddingTop: '20px' }}
               />
               {data.some(item => item.previous !== undefined) && (
-                <Bar dataKey="previous" fill={chartColors.previous} name="Período Anterior" radius={[4, 4, 0, 0]} />
+                <Bar 
+                  dataKey="previous" 
+                  fill={chartColors.previous} 
+                  name="Período Anterior" 
+                  radius={[4, 4, 0, 0]} 
+                  stroke={chartColors.previous}
+                  strokeWidth={2}
+                />
               )}
-              <Bar dataKey="current" fill={chartColors.current} name="Período Atual" radius={[4, 4, 0, 0]} />
+              <Bar 
+                dataKey="current" 
+                fill={chartColors.current} 
+                name="Período Atual" 
+                radius={[4, 4, 0, 0]} 
+                stroke={chartColors.current}
+                strokeWidth={2}
+              />
               {data.some(item => item.goal !== undefined) && (
-                <Bar dataKey="goal" fill={chartColors.goal} name="Meta" radius={[4, 4, 0, 0]} />
+                <Bar 
+                  dataKey="goal" 
+                  fill={chartColors.goal} 
+                  name="Meta" 
+                  radius={[4, 4, 0, 0]} 
+                  stroke={chartColors.goal}
+                  strokeWidth={2}
+                />
               )}
             </BarChart>
           )}
