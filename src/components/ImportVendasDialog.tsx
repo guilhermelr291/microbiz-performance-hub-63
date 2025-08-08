@@ -81,63 +81,80 @@ export const ImportVendasDialog = () => {
 
         <div className="p-6 space-y-6">
           <section className="rounded-lg border bg-card p-4 sm:p-5 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <Download className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">Baixar planilha modelo</h3>
-                  <p className="text-sm text-muted-foreground">Arquivo Excel (.xlsx) com colunas corretas</p>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">1</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <Download className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <h3 className="font-medium">Baixar planilha modelo</h3>
+                      <p className="text-sm text-muted-foreground">Arquivo Excel (.xlsx) com colunas corretas</p>
+                    </div>
+                  </div>
+                  <Button variant="secondary" onClick={downloadTemplate} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Baixar modelo
+                  </Button>
                 </div>
               </div>
-              <Button variant="secondary" onClick={downloadTemplate} className="gap-2">
-                <Download className="h-4 w-4" />
-                Baixar modelo
-              </Button>
             </div>
           </section>
 
           <section>
-            <p className="text-sm text-muted-foreground">
-              Preencha a planilha com os dados de vendas seguindo o modelo indicado nas colunas.
-              Use datas no formato AAAA-MM-DD e valores numéricos para o campo Valor.
-            </p>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">2</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Preencha a planilha com os dados de vendas seguindo o modelo indicado nas colunas.
+                Use datas no formato AAAA-MM-DD e valores numéricos para o campo Valor.
+              </p>
+            </div>
           </section>
 
           <section>
-            <label
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              className={cn(
-                "group relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/40 p-8 text-center transition",
-                "hover:bg-muted/60 focus-within:ring-2 focus-within:ring-ring",
-                isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/30"
-              )}
-            >
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".xlsx,.xls"
-                className="sr-only"
-                onChange={onInputChange}
-              />
-              <UploadCloud className="mb-3 h-8 w-8 text-muted-foreground group-hover:text-foreground" />
-              <div className="space-y-1">
-                <p className="text-sm">Arraste e solte o arquivo aqui</p>
-                <p className="text-xs text-muted-foreground">
-                  ou <button type="button" onClick={handleBrowseClick} className="underline underline-offset-4">clique para selecionar</button>
-                </p>
-                <p className="text-xs text-muted-foreground">Formatos aceitos: .xlsx, .xls</p>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">3</span>
               </div>
-              {fileName && (
-                <div className="mt-4 rounded-md bg-background px-3 py-2 text-xs text-muted-foreground border">
-                  Selecionado: <span className="font-medium text-foreground">{fileName}</span>
+              <label
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={onDrop}
+                className={cn(
+                  "group relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/40 p-8 text-center transition",
+                  "hover:bg-muted/60 focus-within:ring-2 focus-within:ring-ring",
+                  isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/30"
+                )}
+              >
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept=".xlsx,.xls"
+                  className="sr-only"
+                  onChange={onInputChange}
+                />
+                <UploadCloud className="mb-3 h-8 w-8 text-muted-foreground group-hover:text-foreground" />
+                <div className="space-y-1">
+                  <p className="text-sm">Arraste e solte o arquivo aqui</p>
+                  <p className="text-xs text-muted-foreground">
+                    ou <button type="button" onClick={handleBrowseClick} className="underline underline-offset-4">clique para selecionar</button>
+                  </p>
+                  <p className="text-xs text-muted-foreground">Formatos aceitos: .xlsx, .xls</p>
                 </div>
-              )}
-            </label>
+                {fileName && (
+                  <div className="mt-4 rounded-md bg-background px-3 py-2 text-xs text-muted-foreground border">
+                    Selecionado: <span className="font-medium text-foreground">{fileName}</span>
+                  </div>
+                )}
+              </label>
+            </div>
           </section>
         </div>
 
