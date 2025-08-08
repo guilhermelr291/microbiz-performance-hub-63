@@ -72,8 +72,18 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
       ticketComparison: 8,
       salesChart,
       revenueByType: [
-        { name: 'Produtos', current: productRevenue, previous: Math.round(productRevenue * 0.85) },
-        { name: 'Serviços', current: serviceRevenue, previous: Math.round(serviceRevenue * 0.8) },
+        { 
+          name: 'Produtos', 
+          current: productRevenue, 
+          previous: Math.round(productRevenue * 0.85),
+          goal: Math.round(productRevenue * 1.2)
+        },
+        { 
+          name: 'Serviços', 
+          current: serviceRevenue, 
+          previous: Math.round(serviceRevenue * 0.8),
+          goal: Math.round(serviceRevenue * 1.15)
+        },
       ],
       ticketChart: dateLabels.map((item) => ({
         name: item.label,
@@ -100,8 +110,18 @@ const getSalesData = (period: Period, dateRange?: DateRange) => {
         { name: '22/04', current: 20000, previous: 19000 },
       ],
       revenueByType: [
-        { name: 'Produtos', current: 42200, previous: 36000 },
-        { name: 'Serviços', current: 36300, previous: 28800 },
+        { 
+          name: 'Produtos', 
+          current: 42200, 
+          previous: 36000,
+          goal: 50000
+        },
+        { 
+          name: 'Serviços', 
+          current: 36300, 
+          previous: 28800,
+          goal: 42000
+        },
       ],
       ticketChart: [
         { name: '01/04', current: 260, previous: 240 },

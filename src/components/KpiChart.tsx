@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { ChartConfig } from './ChartConfig';
@@ -145,7 +145,7 @@ const KpiChart = ({
           ) : (
             <BarChart
               data={data}
-              margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
+              margin={{ top: 5, right: 10, left: 10, bottom: 40 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
@@ -162,12 +162,18 @@ const KpiChart = ({
               />
               <Tooltip 
                 formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
-                labelFormatter={(label) => `Semana: ${label}`}
+                labelFormatter={(label) => `${label}`}
               />
-              <Bar dataKey="current" fill={chartColors.current} name="Atual" radius={[4, 4, 0, 0]} />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                iconType="rect"
+                wrapperStyle={{ paddingTop: '20px' }}
+              />
               {data.some(item => item.previous !== undefined) && (
-                <Bar dataKey="previous" fill={chartColors.previous} name="Anterior" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="previous" fill={chartColors.previous} name="Período Anterior" radius={[4, 4, 0, 0]} />
               )}
+              <Bar dataKey="current" fill={chartColors.current} name="Período Atual" radius={[4, 4, 0, 0]} />
               {data.some(item => item.goal !== undefined) && (
                 <Bar dataKey="goal" fill={chartColors.goal} name="Meta" radius={[4, 4, 0, 0]} />
               )}
