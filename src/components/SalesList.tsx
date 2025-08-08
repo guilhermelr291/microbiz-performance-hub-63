@@ -4,10 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DateRange, Period } from '@/types/metrics';
+import { DateRange } from '@/types/metrics';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { Button } from '@/components/ui/button';
-import SalesOverview from '@/components/SalesOverview';
 import * as XLSX from 'xlsx';
 export type SaleStatus = 'concluída' | 'cancelada';
 export type SaleType = 'produto' | 'serviço';
@@ -141,10 +140,7 @@ const SalesList = () => {
   };
 
   return (
-    <section className="w-full space-y-6">
-      {/* Gráficos de Vendas */}
-      <SalesOverview period="custom" dateRange={effectiveRange} />
-      
+    <section className="w-full space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>Vendas</CardTitle>

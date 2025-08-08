@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LabelList } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { ChartConfig } from './ChartConfig';
@@ -41,9 +41,9 @@ const KpiChart = ({
   const isNeutral = comparison && comparison === 0;
   
   const [chartColors, setChartColors] = useState({
-    current: '#2563EB',  // Azul principal do dashboard
-    previous: '#FDE68A', // Amarelo suave
-    goal: '#9CA3AF'      // Cinza claro
+    current: '#8884d8',
+    previous: '#82ca9d',
+    goal: '#ff7300'
   });
 
   // Update to handle weekly goals instead of daily
@@ -144,84 +144,32 @@ const KpiChart = ({
             </LineChart>
           ) : (
             <BarChart
-              data={dataWithWeeklyGoals}
-              margin={{ top: 30, right: 30, left: 10, bottom: 5 }}
-              barCategoryGap="20%"
+              data={data}
+              margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 dataKey="name" 
                 axisLine={false}
                 tickLine={false}
                 tickMargin={8}
-                tick={{ fill: '#1F2937', fontSize: 12 }}
               />
               <YAxis 
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(value) => `${prefix}${value}${suffix}`}
                 tickMargin={8}
-                tick={{ fill: '#1F2937', fontSize: 12 }}
               />
               <Tooltip 
-                formatter={(value, name) => [
-                  `${prefix}${Number(value).toLocaleString('pt-BR')}${suffix}`, 
-                  name === 'current' ? 'Mês Atual (Agosto)' : 
-                  name === 'previous' ? 'Mês Anterior (Julho)' : 'Meta'
-                ]}
-                labelFormatter={(label) => `Data: ${label}`}
-                contentStyle={{ 
-                  backgroundColor: '#FFFFFF', 
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}
+                formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
+                labelFormatter={(label) => `Semana: ${label}`}
               />
-              <Bar 
-                dataKey="current" 
-                fill={chartColors.current} 
-                name="current" 
-                radius={[4, 4, 0, 0]}
-                maxBarSize={60}
-              >
-                <LabelList 
-                  dataKey="current" 
-                  position="top" 
-                  style={{ fill: '#1F2937', fontSize: '11px', fontWeight: '500' }}
-                  formatter={(value: number) => `${prefix}${value.toLocaleString('pt-BR')}${suffix}`}
-                />
-              </Bar>
+              <Bar dataKey="current" fill={chartColors.current} name="Atual" radius={[4, 4, 0, 0]} />
               {data.some(item => item.previous !== undefined) && (
-                <Bar 
-                  dataKey="previous" 
-                  fill={chartColors.previous} 
-                  name="previous" 
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={60}
-                >
-                  <LabelList 
-                    dataKey="previous" 
-                    position="top" 
-                    style={{ fill: '#1F2937', fontSize: '11px', fontWeight: '500' }}
-                    formatter={(value: number) => `${prefix}${value.toLocaleString('pt-BR')}${suffix}`}
-                  />
-                </Bar>
+                <Bar dataKey="previous" fill={chartColors.previous} name="Anterior" radius={[4, 4, 0, 0]} />
               )}
-              {(goalValue || data.some(item => item.goal !== undefined)) && (
-                <Bar 
-                  dataKey="goal" 
-                  fill={chartColors.goal} 
-                  name="goal" 
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={60}
-                >
-                  <LabelList 
-                    dataKey="goal" 
-                    position="top" 
-                    style={{ fill: '#1F2937', fontSize: '11px', fontWeight: '500' }}
-                    formatter={(value: number) => `${prefix}${value.toLocaleString('pt-BR')}${suffix}`}
-                  />
-                </Bar>
+              {data.some(item => item.goal !== undefined) && (
+                <Bar dataKey="goal" fill={chartColors.goal} name="Meta" radius={[4, 4, 0, 0]} />
               )}
             </BarChart>
           )}

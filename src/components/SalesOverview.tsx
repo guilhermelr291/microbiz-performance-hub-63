@@ -164,10 +164,10 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <KpiChart 
-          title="📊 Faturamento por Período – Agosto vs Julho" 
+          title="Faturamento por Período" 
           subtitle="Comparação com mesmo período do mês anterior"
           data={data.salesChart}
-          type="bar"
+          type="line"
           comparison={data.revenueComparison}
           prefix="R$ "
           goalValue={data.goalValue}
@@ -182,10 +182,9 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
 
       <div className="grid grid-cols-1 mt-6">
         <KpiChart 
-          title="🎯 Ticket Médio Diário – Agosto vs Julho" 
-          subtitle="Evolução do ticket médio no período"
+          title="Ticket Médio" 
           data={data.ticketChart}
-          type="bar"
+          type="line"
           comparison={data.ticketComparison}
           prefix="R$ "
         />
