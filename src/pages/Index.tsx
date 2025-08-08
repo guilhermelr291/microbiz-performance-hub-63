@@ -10,6 +10,7 @@ import { GeneralAnalysis } from '@/components/GeneralAnalysis';
 import { DashboardCards } from '@/components/DashboardCards';
 import CustomersList from '@/components/CustomersList';
 import SalesList from '@/components/SalesList';
+import MetricsHeader from '@/components/MetricsHeader';
 import { Period, DateRange } from '@/types/metrics';
 
 // Helper function to get previous month's equivalent date range
@@ -139,6 +140,10 @@ const Index = () => {
     >
       <div className="px-6">
         <DashboardCards />
+        <MetricsHeader 
+          dateRange={dateRange} 
+          onDateRangeChange={setDateRange} 
+        />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="overview">Vendas</TabsTrigger>
