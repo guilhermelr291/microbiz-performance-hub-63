@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
 import { ChartConfig } from './ChartConfig';
@@ -88,7 +88,40 @@ const KpiChart = ({
           />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
+        {/* Percentage badges for bar charts */}
+        {type === 'bar' && data.some(item => item.comparison !== undefined) && (
+          <div className="absolute top-2 left-0 right-0 flex justify-around z-10">
+            {data.map((item, index) => {
+              if (item.comparison !== undefined) {
+                const isPositive = item.comparison > 0;
+                const isNeutral = item.comparison === 0;
+                return (
+                  <div 
+                    key={`badge-${index}`} 
+                    className={`flex items-center rounded-md px-2 py-1 text-xs font-semibold ${
+                      isPositive 
+                        ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400' 
+                        : isNeutral 
+                          ? 'bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                          : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400'
+                    }`}
+                  >
+                    {isPositive ? (
+                      <ArrowUp className="mr-1 h-3 w-3" />
+                    ) : isNeutral ? (
+                      <Minus className="mr-1 h-3 w-3" />
+                    ) : (
+                      <ArrowDown className="mr-1 h-3 w-3" />
+                    )}
+                    <span>{isPositive ? '+' : ''}{item.comparison}%</span>
+                  </div>
+                );
+              }
+              return <div key={`empty-${index}`} className="invisible" />;
+            })}
+          </div>
+        )}
         <ResponsiveContainer width="100%" height={height}>
           {type === 'line' ? (
             <LineChart
@@ -219,27 +252,6 @@ const KpiChart = ({
               {data.some(item => item.goal !== undefined) && (
                 <Bar dataKey="goal" fill={chartColors.goal} name="Meta" radius={[4, 4, 0, 0]} />
               )}
-              {/* Render percentage labels */}
-              {data.map((item, index) => {
-                if (item.comparison !== undefined) {
-                  const isPositive = item.comparison > 0;
-                  const isNeutral = item.comparison === 0;
-                  return (
-                    <text
-                      key={`percentage-${index}`}
-                      x={index * (400 / data.length) + (400 / data.length) / 2}
-                      y={20}
-                      textAnchor="middle"
-                      fill={isPositive ? '#059669' : isNeutral ? '#6b7280' : '#dc2626'}
-                      fontSize="12"
-                      fontWeight="600"
-                    >
-                      {isPositive ? '+' : ''}{item.comparison}%
-                    </text>
-                  );
-                }
-                return null;
-              })}
             </BarChart>
           )}
         </ResponsiveContainer>
