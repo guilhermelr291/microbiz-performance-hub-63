@@ -2,9 +2,10 @@ import { ReactNode } from 'react';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, BarChart, Users, DollarSign, PieChart, Settings } from 'lucide-react';
+import { CalendarDays, BarChart, Users, DollarSign, Settings, LogOut } from 'lucide-react';
 import { ThemeToggle } from './ThemeProvider';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -12,6 +13,10 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const handleLogout = () => { logout(); navigate('/login'); };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -44,12 +49,6 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
               </Button>
               <Button variant="sidebar" className="w-full justify-start" asChild>
                 <a href="#" className="flex items-center">
-                  <PieChart className="mr-2 h-4 w-4" />
-                  <span>Marketing</span>
-                </a>
-              </Button>
-              <Button variant="sidebar" className="w-full justify-start" asChild>
-                <a href="#" className="flex items-center">
                   <CalendarDays className="mr-2 h-4 w-4" />
                   <span>Metas</span>
                 </a>
@@ -63,15 +62,21 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
             </nav>
           </SidebarContent>
           <SidebarFooter className="border-t p-4">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback>MB</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium">Micro Empresa</p>
-                <p className="text-xs text-muted-foreground">Gestor</p>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="" alt={(user?.name || user?.email || 'Usuário')} />
+                  <AvatarFallback>{(user?.name || user?.email || 'U').slice(0,2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium">{user?.name || user?.email || 'Usuário'}</p>
+                  <p className="text-xs text-muted-foreground">Conectado</p>
+                </div>
               </div>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1">
+                <LogOut className="h-4 w-4" />
+                <span>Sair</span>
+              </Button>
             </div>
           </SidebarFooter>
         </Sidebar>
