@@ -47,11 +47,22 @@ const KpiChart = ({
     goal: '#8884d8'
   });
 
-  // Update to handle weekly goals instead of daily
-  const dataWithWeeklyGoals = data.map((item, index) => {
+  // For ticket average, use constant goal value; for cumulative metrics, use progressive goals
+  const dataWithGoals = data.map((item, index) => {
     if (goalValue) {
-      const weeklyGoal = (goalValue / workingDays) * (index + 1);
-      return { ...item, goal: weeklyGoal };
+      // If the item already has a goal in the data, use it
+      if ('goal' in item && item.goal !== undefined) {
+        return item;
+      }
+      // For cumulative metrics (like revenue), use progressive goals
+      // For average metrics (like ticket average), use constant goal
+      const isAverageMetric = title.toLowerCase().includes('médio') || title.toLowerCase().includes('average');
+      if (isAverageMetric) {
+        return { ...item, goal: goalValue };
+      } else {
+        const weeklyGoal = (goalValue / workingDays) * (index + 1);
+        return { ...item, goal: weeklyGoal };
+      }
     }
     return item;
   });
@@ -125,7 +136,7 @@ const KpiChart = ({
         <ResponsiveContainer width="100%" height={height}>
           {type === 'line' ? (
             <LineChart
-              data={dataWithWeeklyGoals}
+              data={dataWithGoals}
               margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
