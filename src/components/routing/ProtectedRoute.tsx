@@ -8,10 +8,21 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireLicense = true, requireAdmin = false }) => {
-  const { isAuthenticated, user } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  requireLicense = true,
+  requireAdmin = false,
+}) => {
+  const { isAuthenticated, user, loading } = useAuth();
   const { selectedLicenseId } = useLicense();
   const location = useLocation();
+
+  console.log('isAuthenticated:', isAuthenticated);
+  console.log('user:', user);
+  console.log('loading:', loading);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;

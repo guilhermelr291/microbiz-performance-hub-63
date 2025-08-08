@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import api from '@/services/api';
 
 export type Role = 'user' | 'admin';
@@ -25,7 +31,9 @@ const DEMO_TOKEN = 'demo-token';
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Demo mode short-circuit
+    setLoading(true);
     if (email === DEMO_EMAIL && password === DEMO_PASS) {
       const demoUser: AuthUser = {
         id: 'demo-user',
@@ -52,21 +60,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('demoMode', 'true');
       setToken(DEMO_TOKEN);
       setUser(demoUser);
+      setLoading(false);
       return demoUser;
     }
 
-    // Real API login
     const { data } = await api.post('/auth/login', { email, password });
     const receivedToken: string = data?.token;
     const receivedUser: AuthUser = data?.user;
 
-    if (!receivedToken || !receivedUser) throw new Error('Resposta de login inválida');
+    console.log('receivedUser: ', receivedUser);
+
+    if (!receivedToken || !receivedUser)
+      throw new Error('Resposta de login inválida');
 
     localStorage.setItem('authToken', receivedToken);
     localStorage.setItem('authUser', JSON.stringify(receivedUser));
     localStorage.removeItem('demoMode');
     setToken(receivedToken);
     setUser(receivedUser);
+    setLoading(false);
     return receivedUser;
   };
 
@@ -82,15 +94,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const hasRole = (role: Role) => !!user?.roles?.includes(role);
 
-  const value = useMemo<AuthContextValue>(() => ({
-    user,
-    token,
-    loading,
-    isAuthenticated: !!token,
-    login,
-    logout,
-    hasRole,
-  }), [user, token, loading]);
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      token,
+      loading,
+      isAuthenticated: !!token,
+      login,
+      logout,
+      hasRole,
+    }),
+    [user, token, loading]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

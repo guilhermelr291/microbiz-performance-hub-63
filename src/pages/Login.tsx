@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, AuthProvider } from '@/contexts/AuthContext';
 import { useLicense } from '@/contexts/LicenseContext';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
-const Login: React.FC = () => {
+const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const { setLicenses } = useLicense();
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(email, password);
-      // If demo token is set, preload demo licenses
+
       const isDemo = localStorage.getItem('demoMode') === 'true';
       if (isDemo) {
         setLicenses([
@@ -36,15 +36,28 @@ const Login: React.FC = () => {
           { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
         ]);
         navigate('/select-license');
-        toast({ title: 'Modo demo ativo', description: 'Use uma das licenças de exemplo para navegar.' });
+        toast({
+          title: 'Modo demo ativo',
+          description: 'Use uma das licenças de exemplo para navegar.',
+        });
         return;
       }
-      // Fetch licenses for this user after login
-      const { data } = await api.get('/auth/licenses');
-      setLicenses(data || []);
+
+      // const { data } = await api.get('/auth/licenses');
+      // setLicenses(data || []);
+      setLicenses([
+        { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
+        { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
+      ]);
+
       navigate('/select-license');
     } catch (err: any) {
-      toast({ title: 'Falha no login', description: err?.message || 'Verifique suas credenciais.', variant: 'destructive' });
+      console.error('Login failed:', err);
+      toast({
+        title: 'Falha no login',
+        description: err?.message || 'Verifique suas credenciais.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -58,10 +71,17 @@ const Login: React.FC = () => {
         { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
         { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
       ]);
-      toast({ title: 'Modo demo ativo', description: 'Você entrou com um usuário de demonstração.' });
+      toast({
+        title: 'Modo demo ativo',
+        description: 'Você entrou com um usuário de demonstração.',
+      });
       navigate('/select-license');
     } catch (err: any) {
-      toast({ title: 'Erro ao iniciar demo', description: err?.message || 'Tente novamente.', variant: 'destructive' });
+      toast({
+        title: 'Erro ao iniciar demo',
+        description: err?.message || 'Tente novamente.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -74,27 +94,63 @@ const Login: React.FC = () => {
           <CardTitle>Entrar</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4" aria-label="formulário de login">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            aria-label="formulário de login"
+          >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
             </div>
-            <Button type="submit" className="w-full" disabled={loading} aria-busy={loading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+              aria-busy={loading}
+            >
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
           <div className="pt-4">
-            <Button variant="secondary" onClick={handleDemo} className="w-full" disabled={loading}>
+            <Button
+              variant="secondary"
+              onClick={handleDemo}
+              className="w-full"
+              disabled={loading}
+            >
               {loading ? 'Iniciando demo...' : 'Entrar em modo demo'}
             </Button>
           </div>
         </CardContent>
       </Card>
     </main>
+  );
+};
+
+const Login: React.FC = () => {
+  return (
+    <AuthProvider>
+      <LoginForm />
+    </AuthProvider>
   );
 };
 
