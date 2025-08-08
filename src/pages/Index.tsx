@@ -57,7 +57,7 @@ const getGeneralData = (dateRange: DateRange) => {
       serviceComparison: 26,
       ticketAverage: 265,
       ticketComparison: 8,
-      goalValue: Math.round(85000 * scaleFactor),
+      goalValue: Math.round(25000 * scaleFactor),
     },
     customers: {
       customersServed: Math.round(296 * scaleFactor),
