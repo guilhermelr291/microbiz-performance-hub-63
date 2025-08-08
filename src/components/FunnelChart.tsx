@@ -67,9 +67,9 @@ interface FunnelChartProps {
 
 const FunnelChart = ({ data, title, subtitle }: FunnelChartProps) => {
   const colorClasses = [
-    "bg-gradient-to-r from-primary/90 to-primary text-primary-foreground",
-    "bg-gradient-to-r from-accent/90 to-accent text-accent-foreground",
-    "bg-gradient-to-r from-destructive/90 to-destructive text-destructive-foreground",
+    "bg-gradient-to-r from-[hsl(var(--info))]/90 to-[hsl(var(--info))] text-[hsl(var(--info-foreground))]",
+    "bg-gradient-to-r from-[hsl(var(--success))]/90 to-[hsl(var(--success))] text-[hsl(var(--success-foreground))]",
+    "bg-gradient-to-r from-[hsl(var(--warning))]/90 to-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))]",
   ];
   
   const getConversionRate = (currentIndex: number) => {
