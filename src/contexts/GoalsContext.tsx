@@ -7,24 +7,28 @@ interface GoalsContextValue {
   saveGoals: () => void;
 }
 
-const createInitialGoals = (): Goals => ({
-  sales: 85000,
-  productRevenue: 42000,
-  serviceRevenue: 43000,
-  ticketAverage: 265,
-  customers: 300,
-  newCustomers: 90,
-  productsPerClient: 2.0,
-  servicesPerClient: 3.5,
-  marketing: 5000,
-  leadsGenerated: 260,
-  leadsMeetings: 170,
-  marketingSales: 105,
-  cpl: 19.25,
-  leadToMeetingRate: 65.4,
-  meetingToSaleRate: 61.8,
-  roas: 6.0
-});
+const createInitialGoals = (): Goals => {
+  const productRevenue = 42000;
+  const serviceRevenue = 43000;
+  return {
+    sales: productRevenue + serviceRevenue, // Calculado automaticamente
+    productRevenue,
+    serviceRevenue,
+    ticketAverage: 265,
+    customers: 300,
+    newCustomers: 90,
+    productsPerClient: 2.0,
+    servicesPerClient: 3.5,
+    marketing: 5000,
+    leadsGenerated: 260,
+    leadsMeetings: 170,
+    marketingSales: 105,
+    cpl: 19.25,
+    leadToMeetingRate: 65.4,
+    meetingToSaleRate: 61.8,
+    roas: 6.0
+  };
+};
 
 const GoalsContext = createContext<GoalsContextValue | undefined>(undefined);
 
@@ -37,6 +41,8 @@ export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (savedGoals) {
       try {
         const parsedGoals = JSON.parse(savedGoals);
+        // Ensure sales is always calculated from productRevenue + serviceRevenue
+        parsedGoals.sales = parsedGoals.productRevenue + parsedGoals.serviceRevenue;
         setGoals(parsedGoals);
       } catch (error) {
         console.error('Error loading saved goals:', error);
@@ -49,8 +55,13 @@ export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const saveGoals = () => {
-    localStorage.setItem('dashboard-goals', JSON.stringify(goals));
-    console.log('Goals saved:', goals);
+    // Ensure sales is calculated before saving
+    const goalsToSave = {
+      ...goals,
+      sales: goals.productRevenue + goals.serviceRevenue
+    };
+    localStorage.setItem('dashboard-goals', JSON.stringify(goalsToSave));
+    console.log('Goals saved:', goalsToSave);
   };
 
   return (

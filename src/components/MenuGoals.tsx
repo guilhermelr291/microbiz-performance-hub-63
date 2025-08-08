@@ -12,13 +12,15 @@ const GoalInput = ({
   value,
   onChange,
   prefix = "", 
-  suffix = ""
+  suffix = "",
+  readOnly = false
 }: { 
   label: string;
   value: number;
-  onChange: (value: number) => void;
+  onChange?: (value: number) => void;
   prefix?: string;
   suffix?: string;
+  readOnly?: boolean;
 }) => {
   return (
     <div className="space-y-2 p-4 border rounded-lg">
@@ -29,10 +31,17 @@ const GoalInput = ({
           <Input
             type="number"
             value={value}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            onChange={readOnly ? undefined : (e) => onChange?.(parseFloat(e.target.value) || 0)}
+            readOnly={readOnly}
+            className={readOnly ? "bg-muted cursor-not-allowed" : ""}
           />
           {suffix && <span className="ml-1">{suffix}</span>}
         </div>
+        {readOnly && (
+          <p className="text-xs text-muted-foreground">
+            Calculado automaticamente: Produtos + Serviços
+          </p>
+        )}
       </div>
     </div>
   );
@@ -42,10 +51,17 @@ const MenuGoals = () => {
   const { goals, updateGoals, saveGoals } = useGoals();
 
   const handleGoalChange = (key: keyof Goals, value: number) => {
-    updateGoals({
+    const updatedGoals = {
       ...goals,
       [key]: value
-    });
+    };
+    
+    // Automatically calculate sales total when product or service revenue changes
+    if (key === 'productRevenue' || key === 'serviceRevenue') {
+      updatedGoals.sales = updatedGoals.productRevenue + updatedGoals.serviceRevenue;
+    }
+    
+    updateGoals(updatedGoals);
   };
 
   const handleSave = () => {
@@ -71,9 +87,9 @@ const MenuGoals = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <GoalInput
                 label="Faturamento Total"
-                value={goals.sales}
-                onChange={(value) => handleGoalChange('sales', value)}
+                value={goals.productRevenue + goals.serviceRevenue}
                 prefix="R$ "
+                readOnly={true}
               />
               <GoalInput
                 label="Faturamento Produtos"
