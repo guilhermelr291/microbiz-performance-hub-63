@@ -142,7 +142,12 @@ const KpiChart = ({
                 tickMargin={8}
               />
               <Tooltip 
-                formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
+                formatter={(value, name) => {
+                  if (name === 'previous') return [`${prefix}${value}${suffix}`, 'Período Anterior'];
+                  if (name === 'current') return [`${prefix}${value}${suffix}`, 'Período Atual'];
+                  if (name === 'goal') return [`${prefix}${value}${suffix}`, 'Meta'];
+                  return [`${prefix}${value}${suffix}`, name];
+                }}
                 labelFormatter={(label) => `Semana: ${label}`}
               />
               <Legend 
