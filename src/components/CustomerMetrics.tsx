@@ -6,8 +6,9 @@ import { DataAnalysis } from '@/components/DataAnalysis';
 import { Period, DateRange } from '@/types/metrics';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useGoals } from '@/contexts/GoalsContext';
 
-const getCustomerData = (period: Period, dateRange?: DateRange) => {
+const getCustomerData = (period: Period, dateRange?: DateRange, goals?: any) => {
   // Function to generate chart data based on date range
   const generateDateChartData = (startDate: Date, endDate: Date, numPoints: number, baseValue: number, growth: number = 1.1) => {
     const result = [];
@@ -37,8 +38,8 @@ const getCustomerData = (period: Period, dateRange?: DateRange) => {
     // Scale monthly data based on the selected period
     const customersServed = Math.round(296 * scaleFactor);
     const newCustomers = Math.round(85 * scaleFactor);
-    const goalCustomersServed = Math.round(300 * scaleFactor);
-    const goalNewCustomers = Math.round(90 * scaleFactor);
+    const goalCustomersServed = Math.round((goals?.customers || 300) * scaleFactor);
+    const goalNewCustomers = Math.round((goals?.newCustomers || 90) * scaleFactor);
     
     return {
       customersServed,
@@ -55,8 +56,8 @@ const getCustomerData = (period: Period, dateRange?: DateRange) => {
       servicesChart: generateDateChartData(dateRange.startDate, dateRange.endDate, 7, 3.2, 1.067),
       goalCustomersServed,
       goalNewCustomers,
-      goalProductsPerClient: 2.0,
-      goalServicesPerClient: 3.5
+      goalProductsPerClient: goals?.productsPerClient || 2.0,
+      goalServicesPerClient: goals?.servicesPerClient || 3.5
     };
   } else {
     // Fallback to monthly data
@@ -93,10 +94,10 @@ const getCustomerData = (period: Period, dateRange?: DateRange) => {
         { name: '15/04', current: 3.2, previous: 3.1 },
         { name: '22/04', current: 3.2, previous: 3.0 },
       ],
-      goalCustomersServed: 300,
-      goalNewCustomers: 90,
-      goalProductsPerClient: 2.0,
-      goalServicesPerClient: 3.5
+      goalCustomersServed: goals?.customers || 300,
+      goalNewCustomers: goals?.newCustomers || 90,
+      goalProductsPerClient: goals?.productsPerClient || 2.0,
+      goalServicesPerClient: goals?.servicesPerClient || 3.5
     };
   }
 };
@@ -107,7 +108,8 @@ interface CustomerMetricsProps {
 }
 
 const CustomerMetrics = ({ period, dateRange }: CustomerMetricsProps) => {
-  const data = getCustomerData(period, dateRange);
+  const { goals } = useGoals();
+  const data = getCustomerData(period, dateRange, goals);
   
   const getPeriodDescription = () => {
     if (period === 'custom' && dateRange) {

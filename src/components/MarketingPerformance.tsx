@@ -6,8 +6,9 @@ import FunnelChart from '@/components/FunnelChart';
 import { Period, DateRange } from '@/types/metrics';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useGoals } from '@/contexts/GoalsContext';
 
-const getMarketingData = (period: Period, dateRange?: DateRange) => {
+const getMarketingData = (period: Period, dateRange?: DateRange, goals?: any) => {
   const generateDateChartData = (startDate: Date, endDate: Date, numPoints: number, baseValue: number, growth: number = 1.1) => {
     const result = [];
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -36,10 +37,10 @@ const getMarketingData = (period: Period, dateRange?: DateRange) => {
     const leadsGenerated = Math.round(240 * scaleFactor);
     const leadsMeetings = Math.round(155 * scaleFactor);
     const sales = Math.round(95 * scaleFactor);
-    const goalInvestment = Math.round(5000 * scaleFactor);
-    const goalLeadsGenerated = Math.round(250 * scaleFactor);
-    const goalMeetings = Math.round(175 * scaleFactor);
-    const goalSales = Math.round(120 * scaleFactor);
+    const goalInvestment = Math.round((goals?.marketing || 5000) * scaleFactor);
+    const goalLeadsGenerated = Math.round((goals?.leadsGenerated || 250) * scaleFactor);
+    const goalMeetings = Math.round((goals?.leadsMeetings || 175) * scaleFactor);
+    const goalSales = Math.round((goals?.marketingSales || 120) * scaleFactor);
     
     return {
       investment,
@@ -77,10 +78,10 @@ const getMarketingData = (period: Period, dateRange?: DateRange) => {
       goalLeadsGenerated,
       goalMeetings,
       goalSales,
-      goalCpl: 17,
-      goalLeadMeetingRate: 70,
-      goalMeetingSaleRate: 68.6,
-      goalRoas: 6.5
+      goalCpl: goals?.cpl || 17,
+      goalLeadMeetingRate: goals?.leadToMeetingRate || 70,
+      goalMeetingSaleRate: goals?.meetingToSaleRate || 68.6,
+      goalRoas: goals?.roas || 6.5
     };
   } else {
     return {
@@ -150,14 +151,14 @@ const getMarketingData = (period: Period, dateRange?: DateRange) => {
       roasChart: [
         { name: 'Mês', current: 5.59, previous: 4.79 },
       ],
-      goalInvestment: 5000,
-      goalLeadsGenerated: 250,
-      goalMeetings: 175,
-      goalSales: 120,
-      goalCpl: 17,
-      goalLeadMeetingRate: 70,
-      goalMeetingSaleRate: 68.6,
-      goalRoas: 6.5
+      goalInvestment: goals?.marketing || 5000,
+      goalLeadsGenerated: goals?.leadsGenerated || 250,
+      goalMeetings: goals?.leadsMeetings || 175,
+      goalSales: goals?.marketingSales || 120,
+      goalCpl: goals?.cpl || 17,
+      goalLeadMeetingRate: goals?.leadToMeetingRate || 70,
+      goalMeetingSaleRate: goals?.meetingToSaleRate || 68.6,
+      goalRoas: goals?.roas || 6.5
     };
   }
 };
@@ -168,7 +169,8 @@ interface MarketingPerformanceProps {
 }
 
 const MarketingPerformance = ({ period, dateRange }: MarketingPerformanceProps) => {
-  const data = getMarketingData(period, dateRange);
+  const { goals } = useGoals();
+  const data = getMarketingData(period, dateRange, goals);
   
   const getPeriodDescription = () => {
     if (period === 'custom' && dateRange) {

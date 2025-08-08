@@ -12,6 +12,7 @@ import CustomersList from '@/components/CustomersList';
 import SalesList from '@/components/SalesList';
 import MetricsHeader from '@/components/MetricsHeader';
 import { Period, DateRange } from '@/types/metrics';
+import { useGoals } from '@/contexts/GoalsContext';
 
 // Helper function to get previous month's equivalent date range
 const getPreviousMonthDateRange = (dateRange: DateRange): DateRange => {
@@ -38,7 +39,7 @@ const getDefaultDateRange = (): DateRange => {
   };
 };
 
-const getGeneralData = (dateRange: DateRange) => {
+const getGeneralData = (dateRange: DateRange, goals: any) => {
   // For now, we'll simulate the data based on the date range
   // In a real app, this would fetch data from an API using the date range
   
@@ -57,7 +58,7 @@ const getGeneralData = (dateRange: DateRange) => {
       serviceComparison: 26,
       ticketAverage: 265,
       ticketComparison: 8,
-      goalValue: Math.round(85000 * scaleFactor),
+      goalValue: Math.round((goals?.sales || 85000) * scaleFactor),
     },
     customers: {
       customersServed: Math.round(296 * scaleFactor),
@@ -68,10 +69,10 @@ const getGeneralData = (dateRange: DateRange) => {
       productsComparison: 12.5,
       servicesPerClient: 3.2,
       servicesComparison: 6.7,
-      goalCustomersServed: Math.round(300 * scaleFactor),
-      goalNewCustomers: Math.round(90 * scaleFactor),
-      goalProductsPerClient: 2.0,
-      goalServicesPerClient: 3.5
+      goalCustomersServed: Math.round((goals?.customers || 300) * scaleFactor),
+      goalNewCustomers: Math.round((goals?.newCustomers || 90) * scaleFactor),
+      goalProductsPerClient: goals?.productsPerClient || 2.0,
+      goalServicesPerClient: goals?.servicesPerClient || 3.5
     },
     marketing: {
       investment: Math.round(4500 * scaleFactor),
@@ -90,14 +91,14 @@ const getGeneralData = (dateRange: DateRange) => {
       meetingToSaleRateComparison: 4.8,
       roas: 5.59,
       roasComparison: 10.5,
-      goalInvestment: Math.round(5000 * scaleFactor),
-      goalLeadsGenerated: Math.round(260 * scaleFactor),
-      goalLeadsMeetings: Math.round(170 * scaleFactor),
-      goalSales: Math.round(105 * scaleFactor),
-      goalCpl: 19.25,
-      goalLeadToMeetingRate: 65.4,
-      goalMeetingToSaleRate: 61.8,
-      goalRoas: 6.0
+      goalInvestment: Math.round((goals?.marketing || 5000) * scaleFactor),
+      goalLeadsGenerated: Math.round((goals?.leadsGenerated || 260) * scaleFactor),
+      goalLeadsMeetings: Math.round((goals?.leadsMeetings || 170) * scaleFactor),
+      goalSales: Math.round((goals?.marketingSales || 105) * scaleFactor),
+      goalCpl: goals?.cpl || 19.25,
+      goalLeadToMeetingRate: goals?.leadToMeetingRate || 65.4,
+      goalMeetingToSaleRate: goals?.meetingToSaleRate || 61.8,
+      goalRoas: goals?.roas || 6.0
     }
   };
 };
@@ -106,7 +107,8 @@ const Index = () => {
   const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
   const [activeTab, setActiveTab] = useState('overview');
   const period: Period = 'custom';
-  const generalData = getGeneralData(dateRange);
+  const { goals } = useGoals();
+  const generalData = getGeneralData(dateRange, goals);
 
   const calculateAdjustedGoal = (monthlyGoal: number, dateRange: DateRange) => {
     const daysDiff = Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
