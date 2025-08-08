@@ -151,14 +151,6 @@ const KpiChart = ({
                 iconType="line"
                 wrapperStyle={{ paddingTop: '20px' }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="current" 
-                stroke={chartColors.current} 
-                strokeWidth={4} 
-                dot={{ r: 6, strokeWidth: 2 }} 
-                name="Atual"
-              />
               {data.some(item => item.previous !== undefined) && (
                 <Line 
                   type="monotone" 
@@ -166,10 +158,18 @@ const KpiChart = ({
                   stroke={chartColors.previous} 
                   strokeWidth={4} 
                   dot={{ r: 6, strokeWidth: 2 }}
-                  name="Anterior" 
+                  name="Período Anterior" 
                   strokeDasharray="8 4"
                 />
               )}
+              <Line 
+                type="monotone" 
+                dataKey="current" 
+                stroke={chartColors.current} 
+                strokeWidth={4} 
+                dot={{ r: 6, strokeWidth: 2 }} 
+                name="Período Atual"
+              />
               {(goalValue || data.some(item => item.goal !== undefined)) && (
                 <Line
                   type="monotone"
