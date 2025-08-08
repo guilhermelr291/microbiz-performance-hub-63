@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import * as XLSX from 'xlsx';
 export type CustomerStatus = 'ativo' | 'inativo';
 
@@ -51,8 +52,11 @@ const CustomersList = () => {
   const [nome, setNome] = useState('');
   const [documento, setDocumento] = useState('');
 
+  const PER_PAGE = 100;
+  const [page, setPage] = useState(1);
+
   const rows = useMemo(() => {
-    const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normalize = (s: string) => s.normalize('NFD').replace(/[^\w\s]/g, '').replace(/[\u0300-\u036f]/g, '');
     const onlyDigits = (s: string) => s.replace(/\D/g, '');
 
     const filtroNome = normalize(nome.toLowerCase());
@@ -65,6 +69,11 @@ const CustomersList = () => {
       return nomeMatch && docMatch;
     });
   }, [customers, nome, documento]);
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  const paginatedRows = useMemo(() => rows.slice((page - 1) * PER_PAGE, page * PER_PAGE), [rows, page]);
+
+  useEffect(() => { setPage(1); }, [nome, documento]);
 
   const dataToExport = useMemo(() =>
     rows.map((c) => ({
@@ -123,7 +132,7 @@ const CustomersList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((c) => (
+                {paginatedRows.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell>{c.nome}</TableCell>
                     <TableCell>{c.documento}</TableCell>
@@ -137,6 +146,48 @@ const CustomersList = () => {
                 ))}
               </TableBody>
             </Table>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3">
+            <p className="text-xs text-muted-foreground">Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, rows.length)} de {rows.length}</p>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, page - 1)); }} />
+                </PaginationItem>
+                {page > 2 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(1); }}>1</PaginationLink>
+                    </PaginationItem>
+                    {page > 3 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                  </>
+                )}
+                {[page - 1, page, page + 1].filter(p => p >= 1 && p <= totalPages).map(p => (
+                  <PaginationItem key={p}>
+                    <PaginationLink href="#" isActive={p === page} onClick={(e) => { e.preventDefault(); setPage(p); }}>{p}</PaginationLink>
+                  </PaginationItem>
+                ))}
+                {page < totalPages - 1 && (
+                  <>
+                    {page < totalPages - 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(totalPages); }}>{totalPages}</PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+                <PaginationItem>
+                  <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, page + 1)); }} />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </CardContent>
       </Card>

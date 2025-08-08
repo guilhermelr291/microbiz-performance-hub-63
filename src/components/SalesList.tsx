@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DateRange } from '@/types/metrics';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import * as XLSX from 'xlsx';
 export type SaleStatus = 'concluída' | 'cancelada';
 export type SaleType = 'produto' | 'serviço';
@@ -98,8 +99,12 @@ const SalesList = () => {
   const [period, setPeriod] = useState<'mes' | 'ultimos7' | 'custom'>('mes');
   const [dateRange, setDateRange] = useState<DateRange>(getCurrentMonthRange());
   const [descricao, setDescricao] = useState('');
-const [tipo, setTipo] = useState<'todos' | SaleType>('todos');
+  const [tipo, setTipo] = useState<'todos' | SaleType>('todos');
   const [filial, setFilial] = useState<'todas' | number>('todas');
+
+  // paginação
+  const PER_PAGE = 100;
+  const [page, setPage] = useState(1);
 
   const effectiveRange = useMemo(() => {
     if (period === 'mes') return getCurrentMonthRange();
@@ -137,6 +142,11 @@ const rows = useMemo(() => {
     'Tipo': s.tipo.charAt(0).toUpperCase() + s.tipo.slice(1),
     'Status': s.status === 'concluída' ? 'Concluída' : 'Cancelada',
   })), [rows]);
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  const paginatedRows = useMemo(() => rows.slice((page - 1) * PER_PAGE, page * PER_PAGE), [rows, page]);
+
+  useEffect(() => { setPage(1); }, [effectiveRange, descricao, tipo, filial]);
 
   const handleExport = () => {
     const ws = XLSX.utils.json_to_sheet(dataToExport);
@@ -239,7 +249,7 @@ const rows = useMemo(() => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((s) => (
+                {paginatedRows.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell>{new Date(s.dataVenda).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell>{s.codigo}</TableCell>
@@ -258,11 +268,53 @@ const rows = useMemo(() => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-    </section>
+              </Table>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3">
+              <p className="text-xs text-muted-foreground">Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, rows.length)} de {rows.length}</p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, page - 1)); }} />
+                  </PaginationItem>
+                  {page > 2 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(1); }}>1</PaginationLink>
+                      </PaginationItem>
+                      {page > 3 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                    </>
+                  )}
+                  {[page - 1, page, page + 1].filter(p => p >= 1 && p <= totalPages).map(p => (
+                    <PaginationItem key={p}>
+                      <PaginationLink href="#" isActive={p === page} onClick={(e) => { e.preventDefault(); setPage(p); }}>{p}</PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  {page < totalPages - 1 && (
+                    <>
+                      {page < totalPages - 2 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                      <PaginationItem>
+                        <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setPage(totalPages); }}>{totalPages}</PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+                  <PaginationItem>
+                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, page + 1)); }} />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
   );
 };
 
