@@ -191,7 +191,7 @@ const SalesOverview = ({ period, dateRange }: SalesOverviewProps) => {
           title="Faturamento por Período" 
           subtitle="Comparação com mesmo período do mês anterior"
           data={data.salesChart}
-          type="bar"
+          type="line"
           comparison={data.revenueComparison}
           prefix="R$ "
           goalValue={data.goalValue}
