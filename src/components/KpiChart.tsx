@@ -126,9 +126,9 @@ const KpiChart = ({
           {type === 'line' ? (
             <LineChart
               data={dataWithWeeklyGoals}
-              margin={{ top: 5, right: 10, left: 10, bottom: 40 }}
+              margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" strokeWidth={1} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 dataKey="name" 
                 axisLine={false}
@@ -145,29 +145,23 @@ const KpiChart = ({
                 formatter={(value) => [`${prefix}${value}${suffix}`, 'Valor']}
                 labelFormatter={(label) => `Semana: ${label}`}
               />
-              <Legend 
-                verticalAlign="bottom" 
-                height={36}
-                iconType="line"
-                wrapperStyle={{ paddingTop: '20px' }}
-              />
               <Line 
                 type="monotone" 
                 dataKey="current" 
                 stroke={chartColors.current} 
-                strokeWidth={4} 
-                dot={{ r: 6, strokeWidth: 2, fill: chartColors.current }} 
-                name="Período Atual"
+                strokeWidth={2} 
+                dot={{ r: 4 }} 
+                name="Atual"
               />
               {data.some(item => item.previous !== undefined) && (
                 <Line 
                   type="monotone" 
                   dataKey="previous" 
                   stroke={chartColors.previous} 
-                  strokeWidth={4} 
-                  dot={{ r: 6, strokeWidth: 2, fill: chartColors.previous }}
-                  name="Período Anterior" 
-                  strokeDasharray="8 4"
+                  strokeWidth={2} 
+                  dot={{ r: 4 }}
+                  name="Anterior" 
+                  strokeDasharray="3 3"
                 />
               )}
               {(goalValue || data.some(item => item.goal !== undefined)) && (
@@ -175,10 +169,10 @@ const KpiChart = ({
                   type="monotone"
                   dataKey="goal"
                   stroke={chartColors.goal}
-                  strokeWidth={4}
-                  dot={{ r: 6, strokeWidth: 2, fill: chartColors.goal }}
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
                   name="Meta"
-                  strokeDasharray="12 6"
+                  strokeDasharray="5 5"
                 />
               )}
             </LineChart>
