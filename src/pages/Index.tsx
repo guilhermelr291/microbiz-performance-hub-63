@@ -40,49 +40,49 @@ const getDefaultDateRange = (): DateRange => {
   };
 };
 
-const getGeneralData = (dateRange: DateRange, goals: any) => {
-  // For now, we'll simulate the data based on the date range
-  // In a real app, this would fetch data from an API using the date range
-  
-  // Calculate days in the selected period for scaling data
+const getGeneralData = (dateRange: DateRange, goals: any, filial: 'all' | number) => {
+  // Simulated data based on date range and filial
   const daysDiff = Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   const daysInMonth = 30; // Average month length for simple scaling
-  const scaleFactor = daysDiff / daysInMonth;
-  
+  const timeScale = daysDiff / daysInMonth;
+  const branchScale = filial === 'all' ? 1 : 0.9 + ((Number(filial) % 3) * 0.05);
+
+  const scale = timeScale * branchScale;
+
   return {
     sales: {
-      totalRevenue: Math.round(78500 * scaleFactor),
+      totalRevenue: Math.round(78500 * scale),
       revenueComparison: 22,
-      productRevenue: Math.round(42200 * scaleFactor),
+      productRevenue: Math.round(42200 * scale),
       productComparison: 18,
-      serviceRevenue: Math.round(36300 * scaleFactor),
+      serviceRevenue: Math.round(36300 * scale),
       serviceComparison: 26,
       ticketAverage: 265,
       ticketComparison: 8,
-      goalValue: Math.round((goals?.sales || 85000) * scaleFactor),
+      goalValue: Math.round((goals?.sales || 85000) * scale),
     },
     customers: {
-      customersServed: Math.round(296 * scaleFactor),
+      customersServed: Math.round(296 * scale),
       customersComparison: 18.4,
-      newCustomers: Math.round(85 * scaleFactor),
+      newCustomers: Math.round(85 * scale),
       newCustomersComparison: 30.8,
       productsPerClient: 1.8,
       productsComparison: 12.5,
       servicesPerClient: 3.2,
       servicesComparison: 6.7,
-      goalCustomersServed: Math.round((goals?.customers || 300) * scaleFactor),
-      goalNewCustomers: Math.round((goals?.newCustomers || 90) * scaleFactor),
+      goalCustomersServed: Math.round((goals?.customers || 300) * scale),
+      goalNewCustomers: Math.round((goals?.newCustomers || 90) * scale),
       goalProductsPerClient: goals?.productsPerClient || 2.0,
       goalServicesPerClient: goals?.servicesPerClient || 3.5
     },
     marketing: {
-      investment: Math.round(4500 * scaleFactor),
+      investment: Math.round(4500 * scale),
       investmentComparison: 7,
-      leadsGenerated: Math.round(240 * scaleFactor),
+      leadsGenerated: Math.round(240 * scale),
       leadsGeneratedComparison: 25,
-      leadsMeetings: Math.round(155 * scaleFactor),
+      leadsMeetings: Math.round(155 * scale),
       leadsMeetingsComparison: 18,
-      sales: Math.round(95 * scaleFactor),
+      sales: Math.round(95 * scale),
       salesComparison: 12,
       cpl: 18.75,
       cplComparison: -8.5,
@@ -92,10 +92,10 @@ const getGeneralData = (dateRange: DateRange, goals: any) => {
       meetingToSaleRateComparison: 4.8,
       roas: 5.59,
       roasComparison: 10.5,
-      goalInvestment: Math.round((goals?.marketing || 5000) * scaleFactor),
-      goalLeadsGenerated: Math.round((goals?.leadsGenerated || 260) * scaleFactor),
-      goalLeadsMeetings: Math.round((goals?.leadsMeetings || 170) * scaleFactor),
-      goalSales: Math.round((goals?.marketingSales || 105) * scaleFactor),
+      goalInvestment: Math.round((goals?.marketing || 5000) * scale),
+      goalLeadsGenerated: Math.round((goals?.leadsGenerated || 260) * scale),
+      goalLeadsMeetings: Math.round((goals?.leadsMeetings || 170) * scale),
+      goalSales: Math.round((goals?.marketingSales || 105) * scale),
       goalCpl: goals?.cpl || 19.25,
       goalLeadToMeetingRate: goals?.leadToMeetingRate || 65.4,
       goalMeetingToSaleRate: goals?.meetingToSaleRate || 61.8,
@@ -107,9 +107,10 @@ const getGeneralData = (dateRange: DateRange, goals: any) => {
 const Index = () => {
   const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
   const [activeTab, setActiveTab] = useState('overview');
+  const [filial, setFilial] = useState<'all' | number>('all');
   const period: Period = 'custom';
   const { goals } = useGoals();
-  const generalData = getGeneralData(dateRange, goals);
+  const generalData = getGeneralData(dateRange, goals, filial);
 
 
 
@@ -127,6 +128,9 @@ const Index = () => {
         <MetricsHeader 
           dateRange={dateRange} 
           onDateRangeChange={setDateRange} 
+          filial={filial}
+          onFilialChange={setFilial}
+          availableFiliais={[1,2,3]}
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">

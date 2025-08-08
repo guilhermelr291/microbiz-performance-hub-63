@@ -3,13 +3,17 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays } from 'lucide-react';
 import { DateRange } from '@/types/metrics';
 import { DateRangePicker } from '@/components/DateRangePicker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface MetricsHeaderProps {
   dateRange: DateRange;
   onDateRangeChange: (dateRange: DateRange) => void;
+  filial?: 'all' | number;
+  availableFiliais?: number[];
+  onFilialChange?: (filial: 'all' | number) => void;
 }
 
-const MetricsHeader = ({ dateRange, onDateRangeChange }: MetricsHeaderProps) => {
+const MetricsHeader = ({ dateRange, onDateRangeChange, filial = 'all', availableFiliais = [1,2,3], onFilialChange }: MetricsHeaderProps) => {
   const currentDate = new Date();
   const formattedDate = new Intl.DateTimeFormat('pt-BR', {
     day: 'numeric',
@@ -31,6 +35,21 @@ const MetricsHeader = ({ dateRange, onDateRangeChange }: MetricsHeaderProps) => 
         </p>
       </div>
       <div className="flex items-center gap-2">
+        {onFilialChange && (
+          <div className="w-40">
+            <Select value={String(filial ?? 'all')} onValueChange={(v) => onFilialChange(v === 'all' ? 'all' : Number(v))}>
+              <SelectTrigger aria-label="Selecionar filial">
+                <SelectValue placeholder="Filial" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as filiais</SelectItem>
+                {(availableFiliais ?? [1,2,3]).map((f) => (
+                  <SelectItem key={f} value={String(f)}>Filial {f}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="flex items-center">
           <DateRangePicker dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
         </div>

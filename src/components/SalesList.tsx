@@ -24,6 +24,7 @@ export interface Sale {
   dataCadastro: string; // ISO date string
   status: SaleStatus;
   tipo: SaleType;
+  filial?: number; // número da filial
 }
 
 // Método pronto para integração com backend usando Axios
@@ -32,6 +33,7 @@ export async function fetchSalesApi(params?: {
   endDate?: string;   // ISO
   descricao?: string;
   tipo?: SaleType;
+  filial?: number;
 }): Promise<Sale[]> {
   const response = await axios.get('/api/vendas', { params });
   return response.data as Sale[];
@@ -205,6 +207,7 @@ const SalesList = () => {
                 <TableRow>
                   <TableHead>Data da Venda</TableHead>
                   <TableHead>Código</TableHead>
+                  <TableHead>Filial</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead className="text-right">Quantidade</TableHead>
                   <TableHead className="text-right">Valor unitário</TableHead>
@@ -221,6 +224,7 @@ const SalesList = () => {
                   <TableRow key={s.id}>
                     <TableCell>{new Date(s.dataVenda).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell>{s.codigo}</TableCell>
+                    <TableCell>{typeof s.filial === 'number' ? s.filial : (((typeof s.id === 'number' ? s.id : 0) % 3) + 1)}</TableCell>
                     <TableCell>{s.descricao}</TableCell>
                     <TableCell className="text-right">{s.quantidade}</TableCell>
                     <TableCell className="text-right">{currency.format(s.valorUnitario)}</TableCell>
