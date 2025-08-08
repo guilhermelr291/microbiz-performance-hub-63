@@ -15,20 +15,20 @@ export const IndicatorCell = ({ value, comparison, goalValue, status, isPercenta
   
   switch (status) {
     case 'success':
-      bgColor = 'bg-success';
-      textColor = 'text-success-foreground';
+      bgColor = 'bg-green-100';
+      textColor = 'text-green-800';
       break;
     case 'warning':
-      bgColor = 'bg-warning';
-      textColor = 'text-warning-foreground';
+      bgColor = 'bg-yellow-100';
+      textColor = 'text-yellow-800';
       break;
     case 'danger':
-      bgColor = 'bg-danger';
-      textColor = 'text-danger-foreground';
+      bgColor = 'bg-red-100';
+      textColor = 'text-red-800';
       break;
     default:
-      bgColor = 'bg-muted';
-      textColor = 'text-muted-foreground';
+      bgColor = 'bg-gray-100';
+      textColor = 'text-gray-800';
   }
 
   // Format value based on whether it's a percentage or not
@@ -40,7 +40,7 @@ export const IndicatorCell = ({ value, comparison, goalValue, status, isPercenta
   const goalText = goalValue ? ` / Meta: ${isPercentage ? `${goalValue}%` : goalValue.toLocaleString('pt-BR')}` : '';
   
   // For the comparison indicator styling
-  const comparisonColor = comparison > 0 ? 'text-success' : comparison < 0 ? 'text-danger' : 'text-muted-foreground';
+  const comparisonColor = comparison > 0 ? 'text-green-600' : comparison < 0 ? 'text-red-600' : 'text-gray-500';
   
   return (
     <div className={`flex items-center justify-between px-4 py-2 rounded-md ${bgColor} ${textColor} font-medium`}>
