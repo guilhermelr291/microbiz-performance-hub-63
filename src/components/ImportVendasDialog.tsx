@@ -276,19 +276,7 @@ export const ImportVendasDialog = () => {
       'Tipo',
       'Status',
     ];
-    const example = [
-      '15/08/2025',
-      'VEN-20250815-025',
-      'Loja Leste',
-      'Recuperação de arquivos',
-      1,
-      300.0,
-      300.0,
-      'Beatriz Ferreira',
-      '99880011223',
-      'serviço',
-      'concluída',
-    ];
+
     const ws = XLSX.utils.aoa_to_sheet([headers, example]);
     (ws as any)['!cols'] = headers.map(() => ({ wch: 15 }));
     const wb = XLSX.utils.book_new();

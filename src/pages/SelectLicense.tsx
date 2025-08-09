@@ -6,7 +6,10 @@ import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
-interface LicenseDto { id: string; name: string }
+interface LicenseDto {
+  id: string;
+  name: string;
+}
 
 const SelectLicense: React.FC = () => {
   const { licenses, setLicenses, selectLicense } = useLicense();
@@ -23,11 +26,15 @@ const SelectLicense: React.FC = () => {
       try {
         setLoading(true);
         if (!licenses || licenses.length === 0) {
-          const { data } = await api.get<LicenseDto[]>('/auth/licenses');
+          const { data } = await api.get<LicenseDto[]>('/companies');
           setLicenses(data || []);
         }
       } catch (err: any) {
-        toast({ title: 'Erro ao carregar licenças', description: err?.message || 'Tente novamente mais tarde', variant: 'destructive' });
+        toast({
+          title: 'Erro ao carregar licenças',
+          description: err?.message || 'Tente novamente mais tarde',
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
@@ -50,16 +57,21 @@ const SelectLicense: React.FC = () => {
           <CardContent>
             {loading && <p className="text-muted-foreground">Carregando...</p>}
             {!loading && licenses?.length === 0 && (
-              <p className="text-muted-foreground">Nenhuma licença disponível para este usuário.</p>
+              <p className="text-muted-foreground">
+                Nenhuma licença disponível para este usuário.
+              </p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-              {licenses?.map((l) => (
+              {licenses?.map(l => (
                 <Card key={l.id} className="border">
                   <CardHeader>
                     <CardTitle className="text-base">{l.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Button onClick={() => handleSelect(l)} aria-label={`Selecionar licença ${l.name}`}>
+                    <Button
+                      onClick={() => handleSelect(l)}
+                      aria-label={`Selecionar licença ${l.name}`}
+                    >
                       Selecionar
                     </Button>
                   </CardContent>

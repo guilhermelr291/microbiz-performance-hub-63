@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 export interface License {
   id: string;
@@ -15,12 +21,20 @@ interface LicenseContextValue {
   clearLicense: () => void;
 }
 
-const LicenseContext = createContext<LicenseContextValue | undefined>(undefined);
+const LicenseContext = createContext<LicenseContextValue | undefined>(
+  undefined
+);
 
-export const LicenseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LicenseProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [licenses, setLicensesState] = useState<License[]>([]);
-  const [selectedLicenseId, setSelectedLicenseId] = useState<string | null>(null);
-  const [selectedLicenseName, setSelectedLicenseName] = useState<string | null>(null);
+  const [selectedLicenseId, setSelectedLicenseId] = useState<string | null>(
+    null
+  );
+  const [selectedLicenseName, setSelectedLicenseName] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const savedId = localStorage.getItem('licenseId');
@@ -47,20 +61,26 @@ export const LicenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     localStorage.removeItem('licenseName');
   };
 
-  const value = useMemo(() => ({
-    licenses,
-    selectedLicenseId,
-    selectedLicenseName,
-    setLicenses,
-    selectLicense,
-    clearLicense,
-  }), [licenses, selectedLicenseId, selectedLicenseName]);
+  const value = useMemo(
+    () => ({
+      licenses,
+      selectedLicenseId,
+      selectedLicenseName,
+      setLicenses,
+      selectLicense,
+      clearLicense,
+    }),
+    [licenses, selectedLicenseId, selectedLicenseName]
+  );
 
-  return <LicenseContext.Provider value={value}>{children}</LicenseContext.Provider>;
+  return (
+    <LicenseContext.Provider value={value}>{children}</LicenseContext.Provider>
+  );
 };
 
 export const useLicense = () => {
   const ctx = useContext(LicenseContext);
-  if (!ctx) throw new Error('useLicense deve ser usado dentro de LicenseProvider');
+  if (!ctx)
+    throw new Error('useLicense deve ser usado dentro de LicenseProvider');
   return ctx;
 };
