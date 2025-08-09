@@ -26,13 +26,15 @@ const createInitialGoals = (): Goals => {
     cpl: 19.25,
     leadToMeetingRate: 65.4,
     meetingToSaleRate: 61.8,
-    roas: 6.0
+    roas: 6.0,
   };
 };
 
 const GoalsContext = createContext<GoalsContextValue | undefined>(undefined);
 
-export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [goals, setGoals] = useState<Goals>(createInitialGoals());
 
   // Load goals from localStorage on mount
@@ -42,7 +44,8 @@ export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         const parsedGoals = JSON.parse(savedGoals);
         // Ensure sales is always calculated from productRevenue + serviceRevenue
-        parsedGoals.sales = parsedGoals.productRevenue + parsedGoals.serviceRevenue;
+        parsedGoals.sales =
+          parsedGoals.productRevenue + parsedGoals.serviceRevenue;
         setGoals(parsedGoals);
       } catch (error) {
         console.error('Error loading saved goals:', error);
@@ -58,10 +61,9 @@ export const GoalsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Ensure sales is calculated before saving
     const goalsToSave = {
       ...goals,
-      sales: goals.productRevenue + goals.serviceRevenue
+      sales: goals.productRevenue + goals.serviceRevenue,
     };
     localStorage.setItem('dashboard-goals', JSON.stringify(goalsToSave));
-    console.log('Goals saved:', goalsToSave);
   };
 
   return (

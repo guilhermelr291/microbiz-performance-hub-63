@@ -43,7 +43,7 @@ interface ApiCustomer {
 
 export async function fetchCustomersApi(): Promise<ApiCustomer[]> {
   const response = await api.get('/customers');
-  console.log('response.data', response.data);
+
   return response.data as ApiCustomer[];
 }
 

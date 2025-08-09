@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLicense } from '@/contexts/LicenseContext';
+import { useCompany } from '@/contexts/CompanyContext';
 
 interface ProtectedRouteProps {
   requireLicense?: boolean;
@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAdmin = false,
 }) => {
   const { isAuthenticated, user, loading } = useAuth();
-  const { selectedLicenseId } = useLicense();
+  const { selectedCompanyId: selectedLicenseId } = useCompany();
   const location = useLocation();
 
   console.log('isAuthenticated:', isAuthenticated);

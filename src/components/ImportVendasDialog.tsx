@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { z } from 'zod';
 import api from '@/services/api';
 import { parse } from 'path';
+import { useCompany } from '@/contexts/CompanyContext';
 
 const parseDate = (dateStr: string): string | null => {
   const regex = /^(\d{2})[\/-](\d{2})[\/-](\d{4})$/;
@@ -144,6 +145,7 @@ export const ImportVendasDialog = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [parsedData, setParsedData] = useState<SaleRecord[] | null>(null);
+  const { selectedCompanyId } = useCompany();
 
   const handleBrowseClick = () => inputRef.current?.click();
 
@@ -173,6 +175,7 @@ export const ImportVendasDialog = () => {
       taxId: row['CPF/CNPJ'],
       type: tipoBackend,
       status,
+      companyId: selectedCompanyId,
     };
   };
 
@@ -211,11 +214,7 @@ export const ImportVendasDialog = () => {
           Cliente: String(row['Cliente']).trim(),
         };
 
-        console.log('row for validation: ', rowForValidation);
-
         const parseResult = saleSchema.safeParse(rowForValidation);
-
-        console.log('parse result: ', parseResult);
 
         // Verifica se a validação falhou
         if (!parseResult.success) {
@@ -252,7 +251,6 @@ export const ImportVendasDialog = () => {
   const sendDataToBackend = async () => {
     if (!parsedData) return;
     try {
-      console.log('data> ', JSON.stringify(parsedData, null, 2));
       await api.post('sales', parsedData);
       alert('Vendas importadas com sucesso!');
       setFileName(null);

@@ -4,14 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
-import { useLicense } from '@/contexts/LicenseContext';
+import { useCompany } from '@/contexts/CompanyContext';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const LoginForm: React.FC = () => {
   const { login } = useAuth();
-  const { setLicenses } = useLicense();
+  const { setCompanies: setLicenses } = useCompany();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,26 +29,8 @@ const LoginForm: React.FC = () => {
     try {
       await login(email, password);
 
-      const isDemo = localStorage.getItem('demoMode') === 'true';
-      if (isDemo) {
-        setLicenses([
-          { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
-          { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
-        ]);
-        navigate('/select-license');
-        toast({
-          title: 'Modo demo ativo',
-          description: 'Use uma das licenças de exemplo para navegar.',
-        });
-        return;
-      }
-
       // const { data } = await api.get('/auth/licenses');
       // setLicenses(data || []);
-      setLicenses([
-        { id: 'demo-empresa-01', name: 'Empresa Alpha (DEMO)' },
-        { id: 'demo-empresa-02', name: 'Empresa Beta (DEMO)' },
-      ]);
 
       navigate('/select-license');
     } catch (err: any) {

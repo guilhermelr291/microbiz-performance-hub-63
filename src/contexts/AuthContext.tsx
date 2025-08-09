@@ -68,8 +68,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const receivedToken: string = data?.token;
     const receivedUser: AuthUser = data?.user;
 
-    console.log('receivedUser: ', receivedUser);
-
     if (!receivedToken || !receivedUser)
       throw new Error('Resposta de login inválida');
 

@@ -21,7 +21,7 @@ import {
 import { ThemeToggle } from './ThemeProvider';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLicense } from '@/contexts/LicenseContext';
+import { useCompany } from '@/contexts/CompanyContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -35,7 +35,7 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
     logout();
     navigate('/login');
   };
-  const { selectedLicenseName } = useLicense();
+  const { selectedCompanyName: selectedLicenseName } = useCompany();
 
   return (
     <SidebarProvider>
