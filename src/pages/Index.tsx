@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect, useCallback } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/components/DashboardLayout';
 import SalesOverview from '@/components/SalesOverview';
 import CustomerMetrics from '@/components/CustomerMetrics';
@@ -14,18 +13,20 @@ import MetricsHeader from '@/components/MetricsHeader';
 import { Period, DateRange } from '@/types/metrics';
 import { useGoals } from '@/contexts/GoalsContext';
 import { ImportVendasDialog } from '@/components/ImportVendasDialog';
+import { useCompany } from '@/contexts/CompanyContext';
+import { useCompanyBranch } from '@/contexts/CompanyBranchContext';
 
 // Helper function to get previous month's equivalent date range
 const getPreviousMonthDateRange = (dateRange: DateRange): DateRange => {
   const prevStartDate = new Date(dateRange.startDate);
   prevStartDate.setMonth(prevStartDate.getMonth() - 1);
-  
+
   const prevEndDate = new Date(dateRange.endDate);
   prevEndDate.setMonth(prevEndDate.getMonth() - 1);
-  
+
   return {
     startDate: prevStartDate,
-    endDate: prevEndDate
+    endDate: prevEndDate,
   };
 };
 
@@ -33,19 +34,27 @@ const getPreviousMonthDateRange = (dateRange: DateRange): DateRange => {
 const getDefaultDateRange = (): DateRange => {
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  
+
   return {
     startDate: firstDayOfMonth,
-    endDate: now
+    endDate: now,
   };
 };
 
-const getGeneralData = (dateRange: DateRange, goals: any, filial: 'all' | number) => {
+const getGeneralData = (
+  dateRange: DateRange,
+  goals: any,
+  filial: 'all' | number
+) => {
   // Simulated data based on date range and filial
-  const daysDiff = Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const daysDiff =
+    Math.ceil(
+      (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
+        (1000 * 60 * 60 * 24)
+    ) + 1;
   const daysInMonth = 30; // Average month length for simple scaling
   const timeScale = daysDiff / daysInMonth;
-  const branchScale = filial === 'all' ? 1 : 0.9 + ((Number(filial) % 3) * 0.05);
+  const branchScale = filial === 'all' ? 1 : 0.9 + (Number(filial) % 3) * 0.05;
 
   const scale = timeScale * branchScale;
 
@@ -73,7 +82,7 @@ const getGeneralData = (dateRange: DateRange, goals: any, filial: 'all' | number
       goalCustomersServed: Math.round((goals?.customers || 300) * scale),
       goalNewCustomers: Math.round((goals?.newCustomers || 90) * scale),
       goalProductsPerClient: goals?.productsPerClient || 2.0,
-      goalServicesPerClient: goals?.servicesPerClient || 3.5
+      goalServicesPerClient: goals?.servicesPerClient || 3.5,
     },
     marketing: {
       investment: Math.round(4500 * scale),
@@ -99,8 +108,8 @@ const getGeneralData = (dateRange: DateRange, goals: any, filial: 'all' | number
       goalCpl: goals?.cpl || 19.25,
       goalLeadToMeetingRate: goals?.leadToMeetingRate || 65.4,
       goalMeetingToSaleRate: goals?.meetingToSaleRate || 61.8,
-      goalRoas: goals?.roas || 6.0
-    }
+      goalRoas: goals?.roas || 6.0,
+    },
   };
 };
 
@@ -111,8 +120,21 @@ const Index = () => {
   const period: Period = 'custom';
   const { goals } = useGoals();
   const generalData = getGeneralData(dateRange, goals, filial);
+  const { selectedCompanyId } = useCompany();
 
+  const { fetchCompanyBranches, companyBranches } = useCompanyBranch();
 
+  useEffect(() => {
+    if (selectedCompanyId) {
+      fetchCompanyBranches(selectedCompanyId);
+    }
+    if (companyBranches.length > 0) {
+      const firstBranch = companyBranches[0];
+      setFilial(firstBranch.id);
+    }
+  }, [selectedCompanyId]);
+
+  console.log('company branches: ', companyBranches);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -125,12 +147,12 @@ const Index = () => {
         <div className="flex items-center justify-end mt-4 mb-4">
           <ImportVendasDialog />
         </div>
-        <MetricsHeader 
-          dateRange={dateRange} 
-          onDateRangeChange={setDateRange} 
+        <MetricsHeader
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
           filial={filial}
           onFilialChange={setFilial}
-          availableFiliais={[1,2,3]}
+          availableFiliais={companyBranches}
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
@@ -140,11 +162,11 @@ const Index = () => {
             <TabsTrigger value="analysis">Análise Geral</TabsTrigger>
             <TabsTrigger value="goals">Metas</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="space-y-6">
             <SalesOverview period={period} dateRange={dateRange} />
           </TabsContent>
-          
+
           <TabsContent value="customers" className="space-y-6">
             <CustomerMetrics period={period} dateRange={dateRange} />
           </TabsContent>
@@ -162,7 +184,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="analysis" className="space-y-6">
-            <GeneralAnalysis 
+            <GeneralAnalysis
               salesData={generalData.sales}
               customersData={generalData.customers}
               marketingData={generalData.marketing}
