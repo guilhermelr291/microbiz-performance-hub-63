@@ -17,6 +17,7 @@ import { GoalsProvider } from './contexts/GoalsContext';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import { CompanyBranchProvider } from './contexts/CompanyBranchContext';
 import { SaleMetricsProvider } from './contexts/SalesMetricsContext';
+import { DashboardFiltersProvider } from './contexts/DashboardFiltersContext';
 
 const queryClient = new QueryClient();
 
@@ -27,48 +28,53 @@ const App = () => (
         <Toaster />
         <Sonner />
         <AuthProvider>
-          <CompanyProvider>
-            <CompanyBranchProvider>
-              <SaleMetricsProvider>
-                <GoalsProvider>
-                  <BrowserRouter>
-                    <Routes>
-                      <Route path="/login" element={<Login />} />
+          <DashboardFiltersProvider>
+            <CompanyProvider>
+              <CompanyBranchProvider>
+                <SaleMetricsProvider>
+                  <GoalsProvider>
+                    <BrowserRouter>
+                      <Routes>
+                        <Route path="/login" element={<Login />} />
 
-                      {/* Routes that require authentication but not license selection */}
-                      <Route
-                        element={<ProtectedRoute requireLicense={false} />}
-                      >
+                        {/* Routes that require authentication but not license selection */}
                         <Route
-                          path="/select-license"
-                          element={<SelectCompany />}
-                        />
-                      </Route>
+                          element={<ProtectedRoute requireLicense={false} />}
+                        >
+                          <Route
+                            path="/select-license"
+                            element={<SelectCompany />}
+                          />
+                        </Route>
 
-                      {/* Routes that require authentication and a selected license */}
-                      <Route element={<ProtectedRoute />}>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/vendas" element={<Vendas />} />
-                        <Route path="/clientes" element={<Clientes />} />
-                      </Route>
+                        {/* Routes that require authentication and a selected license */}
+                        <Route element={<ProtectedRoute />}>
+                          <Route path="/" element={<Index />} />
+                          <Route path="/vendas" element={<Vendas />} />
+                          <Route path="/clientes" element={<Clientes />} />
+                        </Route>
 
-                      {/* Admin-only routes (no license required) */}
-                      <Route
-                        element={
-                          <ProtectedRoute requireAdmin requireLicense={false} />
-                        }
-                      >
-                        <Route path="/admin" element={<Admin />} />
-                      </Route>
+                        {/* Admin-only routes (no license required) */}
+                        <Route
+                          element={
+                            <ProtectedRoute
+                              requireAdmin
+                              requireLicense={false}
+                            />
+                          }
+                        >
+                          <Route path="/admin" element={<Admin />} />
+                        </Route>
 
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </BrowserRouter>
-                </GoalsProvider>
-              </SaleMetricsProvider>
-            </CompanyBranchProvider>
-          </CompanyProvider>
+                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </BrowserRouter>
+                  </GoalsProvider>
+                </SaleMetricsProvider>
+              </CompanyBranchProvider>
+            </CompanyProvider>
+          </DashboardFiltersProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

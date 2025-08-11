@@ -15,6 +15,7 @@ import { useGoals } from '@/contexts/GoalsContext';
 import { ImportVendasDialog } from '@/components/ImportVendasDialog';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useCompanyBranch } from '@/contexts/CompanyBranchContext';
+import { useDashboardFilters } from '@/contexts/DashboardFiltersContext';
 
 // Helper function to get previous month's equivalent date range
 const getPreviousMonthDateRange = (dateRange: DateRange): DateRange => {
@@ -116,10 +117,11 @@ const getGeneralData = (
 const Index = () => {
   const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
   const [activeTab, setActiveTab] = useState('overview');
-  const [filial, setFilial] = useState<'all' | number>('all');
+  const { selectedBranchId, setSelectedBranchId } = useDashboardFilters();
+
   const period: Period = 'custom';
   const { goals } = useGoals();
-  const generalData = getGeneralData(dateRange, goals, filial);
+  const generalData = getGeneralData(dateRange, goals, selectedBranchId);
   const { selectedCompanyId } = useCompany();
 
   const { fetchCompanyBranches, companyBranches } = useCompanyBranch();
@@ -130,11 +132,9 @@ const Index = () => {
     }
     if (companyBranches.length > 0) {
       const firstBranch = companyBranches[0];
-      setFilial(firstBranch.id);
+      if (!selectedBranchId) setSelectedBranchId(firstBranch.id);
     }
   }, [selectedCompanyId]);
-
-  console.log('company branches: ', companyBranches);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -150,8 +150,8 @@ const Index = () => {
         <MetricsHeader
           dateRange={dateRange}
           onDateRangeChange={setDateRange}
-          filial={filial}
-          onFilialChange={setFilial}
+          filial={selectedBranchId}
+          onFilialChange={setSelectedBranchId}
           availableFiliais={companyBranches}
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

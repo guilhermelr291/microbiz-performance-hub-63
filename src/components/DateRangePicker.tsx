@@ -1,110 +1,160 @@
-
-import * as React from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { DateRange } from "@/types/metrics";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import * as React from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
+import { useDashboardFilters } from '@/contexts/DashboardFiltersContext';
 
-interface DateRangePickerProps {
-  dateRange: DateRange;
-  onDateRangeChange: (dateRange: DateRange) => void;
-}
+export function MonthYearPicker() {
+  const { selectedPeriod, setSelectedPeriod } = useDashboardFilters();
+  const [isOpen, setIsOpen] = React.useState(false);
 
-export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePickerProps) {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [isStartDateSelected, setIsStartDateSelected] = React.useState(false);
-
-  const handleSelect = (selectedDate: Date | undefined) => {
-    if (!selectedDate) return;
-    
-    if (!isStartDateSelected) {
-      const newDateRange = { 
-        startDate: selectedDate, 
-        endDate: selectedDate 
+  const getCurrentMonthYear = () => {
+    if (!selectedPeriod) {
+      const now = new Date();
+      return {
+        month: now.getMonth(),
+        year: now.getFullYear(),
       };
-      setIsStartDateSelected(true);
-      onDateRangeChange(newDateRange);
-    } else {
-      // If the selected date is before the start date, swap them
-      if (selectedDate < dateRange.startDate) {
-        const newDateRange = {
-          startDate: selectedDate,
-          endDate: dateRange.startDate,
-        };
-        setIsStartDateSelected(false);
-        onDateRangeChange(newDateRange);
-      } else {
-        const newDateRange = {
-          startDate: dateRange.startDate,
-          endDate: selectedDate,
-        };
-        setIsStartDateSelected(false);
-        onDateRangeChange(newDateRange);
-      }
     }
+
+    const [month, year] = selectedPeriod.split('/');
+    return {
+      month: parseInt(month) - 1,
+      year: parseInt(year),
+    };
   };
 
-  const resetSelection = () => {
+  const [currentView, setCurrentView] = React.useState(getCurrentMonthYear());
+
+  React.useEffect(() => {
+    setCurrentView(getCurrentMonthYear());
+  }, [selectedPeriod]);
+
+  const handleMonthSelect = (month: number) => {
+    const monthFormatted = String(month + 1).padStart(2, '0');
+    const newPeriod = `${monthFormatted}/${currentView.year}`;
+    setSelectedPeriod(newPeriod);
+    setIsOpen(false);
+  };
+
+  const handlePreviousYear = () => {
+    setCurrentView(prev => ({ ...prev, year: prev.year - 1 }));
+  };
+
+  const handleNextYear = () => {
+    setCurrentView(prev => ({ ...prev, year: prev.year + 1 }));
+  };
+
+  const resetToCurrentMonth = () => {
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    onDateRangeChange({
-      startDate: firstDayOfMonth,
-      endDate: now
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    const currentYear = now.getFullYear();
+    const currentPeriod = `${currentMonth}/${currentYear}`;
+    setSelectedPeriod(currentPeriod);
+    setCurrentView({
+      month: now.getMonth(),
+      year: currentYear,
     });
-    setIsStartDateSelected(false);
+    setIsOpen(false);
   };
 
   const displayText = React.useMemo(() => {
-    if (dateRange.startDate && dateRange.endDate) {
-      const startFormatted = format(dateRange.startDate, "d 'de' MMMM", { locale: ptBR });
-      const endFormatted = format(dateRange.endDate, "d 'de' MMMM", { locale: ptBR });
-      
-      if (startFormatted === endFormatted) {
-        return startFormatted;
-      }
-      
-      return `${startFormatted} - ${endFormatted}`;
-    }
-    return "Selecione um período";
-  }, [dateRange]);
+    if (!selectedPeriod) return 'Selecione o período';
+
+    const [month, year] = selectedPeriod.split('/');
+    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    return format(date, "MMMM 'de' yyyy", { locale: ptBR });
+  }, [selectedPeriod]);
+
+  const months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
+
+  const isCurrentMonth = (monthIndex: number) => {
+    const current = getCurrentMonthYear();
+    return monthIndex === current.month && currentView.year === current.year;
+  };
 
   return (
     <div className="flex items-center space-x-2">
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="flex items-center gap-2 justify-start pl-3 pr-3"
+            className="flex items-center gap-2 justify-start pl-3 pr-3 min-w-[200px]"
           >
             <CalendarIcon className="h-4 w-4" />
             <span>{displayText}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-2 flex justify-between">
-            <span className="text-sm font-medium">
-              {isStartDateSelected ? "Selecione a data final" : "Selecione a data inicial"}
-            </span>
-            <Button variant="ghost" size="sm" onClick={resetSelection}>
-              Mês atual
-            </Button>
+        <PopoverContent className="w-80 p-0" align="start">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePreviousYear}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <h2 className="text-lg font-semibold">{currentView.year}</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleNextYear}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {months.map((month, index) => (
+                <Button
+                  key={month}
+                  variant={isCurrentMonth(index) ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleMonthSelect(index)}
+                  className={cn(
+                    'h-10 text-sm',
+                    isCurrentMonth(index) &&
+                      'bg-primary text-primary-foreground'
+                  )}
+                >
+                  {month.slice(0, 3)}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex justify-center">
+              <Button variant="outline" size="sm" onClick={resetToCurrentMonth}>
+                Mês atual
+              </Button>
+            </div>
           </div>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleSelect}
-            initialFocus
-            className="p-3 pointer-events-auto"
-            locale={ptBR}
-          />
         </PopoverContent>
       </Popover>
     </div>

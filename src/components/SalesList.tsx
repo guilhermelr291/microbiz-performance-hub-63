@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DateRange } from '@/types/metrics';
-import { DateRangePicker } from '@/components/DateRangePicker';
+import { MonthYearPicker } from '@/components/DateRangePicker';
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
@@ -293,7 +293,7 @@ const SalesList = () => {
                 <label className="block text-sm font-medium mb-1">
                   De - Até
                 </label>
-                <DateRangePicker
+                <MonthYearPicker
                   dateRange={dateRange}
                   onDateRangeChange={handleDateRangeChange}
                 />

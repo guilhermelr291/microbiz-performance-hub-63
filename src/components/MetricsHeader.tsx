@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { CalendarDays } from 'lucide-react';
 import { DateRange } from '@/types/metrics';
-import { DateRangePicker } from '@/components/DateRangePicker';
+import { MonthYearPicker } from './DateRangePicker';
 import {
   Select,
   SelectContent,
@@ -71,7 +71,7 @@ const MetricsHeader = ({
           </div>
         )}
         <div className="flex items-center">
-          <DateRangePicker
+          <MonthYearPicker
             dateRange={dateRange}
             onDateRangeChange={onDateRangeChange}
           />
