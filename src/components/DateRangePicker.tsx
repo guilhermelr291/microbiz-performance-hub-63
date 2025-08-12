@@ -22,17 +22,11 @@ export function MonthYearPicker() {
   const getCurrentMonthYear = () => {
     if (!selectedPeriod) {
       const now = new Date();
-      return {
-        month: now.getMonth(),
-        year: now.getFullYear(),
-      };
+      return { month: now.getMonth(), year: now.getFullYear() };
     }
 
-    const [month, year] = selectedPeriod.split('/');
-    return {
-      month: parseInt(month) - 1,
-      year: parseInt(year),
-    };
+    const [year, month] = selectedPeriod.split('-');
+    return { month: parseInt(month, 10) - 1, year: parseInt(year, 10) };
   };
 
   const [currentView, setCurrentView] = React.useState(getCurrentMonthYear());
@@ -43,7 +37,7 @@ export function MonthYearPicker() {
 
   const handleMonthSelect = (month: number) => {
     const monthFormatted = String(month + 1).padStart(2, '0');
-    const newPeriod = `${monthFormatted}/${currentView.year}`;
+    const newPeriod = `${currentView.year}-${monthFormatted}`;
     setSelectedPeriod(newPeriod);
     setIsOpen(false);
   };
@@ -60,12 +54,8 @@ export function MonthYearPicker() {
     const now = new Date();
     const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
     const currentYear = now.getFullYear();
-    const currentPeriod = `${currentMonth}/${currentYear}`;
-    setSelectedPeriod(currentPeriod);
-    setCurrentView({
-      month: now.getMonth(),
-      year: currentYear,
-    });
+    setSelectedPeriod(`${currentYear}-${currentMonth}`);
+    setCurrentView({ month: now.getMonth(), year: currentYear });
     setIsOpen(false);
   };
 
@@ -80,10 +70,9 @@ export function MonthYearPicker() {
       return 'Período inválido';
     }
 
-    const date = new Date(yearNum, monthNum - 1, 1);
-
-    console.log('date: ', date);
-    return format(date, "MMMM 'de' yyyy", { locale: ptBR });
+    return format(new Date(yearNum, monthNum - 1, 1), "MMMM 'de' yyyy", {
+      locale: ptBR,
+    });
   }, [selectedPeriod]);
 
   const months = [
@@ -102,8 +91,10 @@ export function MonthYearPicker() {
   ];
 
   const isCurrentMonth = (monthIndex: number) => {
-    const current = getCurrentMonthYear();
-    return monthIndex === current.month && currentView.year === current.year;
+    return (
+      monthIndex === currentView.month &&
+      currentView.year === getCurrentMonthYear().year
+    );
   };
 
   return (

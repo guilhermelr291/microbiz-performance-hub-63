@@ -42,72 +42,79 @@ const SalesOverview = () => {
     return format(date, "MMMM 'de' yyyy", { locale: ptBR });
   };
 
+  // Função atualizada para usar dados reais do backend
   const generateChartData = () => {
-    const chartData = [];
-    const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+    if (!salesMetrics.totalRevenue?.weeklyData) return [];
 
-    weeks.forEach((week, index) => {
-      const progressRatio = (index + 1) / 4;
-      chartData.push({
-        name: week,
-        current: Math.round(
-          (salesMetrics.totalRevenue?.selectedPeriod || 0) * progressRatio
-        ),
-        previous: Math.round(
-          (salesMetrics.totalRevenue?.previousMonth || 0) * progressRatio
-        ),
-        goal: Math.round(
-          (salesMetrics.totalRevenue?.selectedPeriodGoal || 0) * progressRatio
-        ),
-      });
-    });
+    const { current, previous, goal } = salesMetrics.totalRevenue.weeklyData;
 
-    return chartData;
+    return current.map((currentWeek, index) => ({
+      name: currentWeek.week,
+      current: currentWeek.value,
+      previous: previous[index]?.value || 0,
+      goal: goal[index]?.value || 0,
+    }));
   };
 
-  // Generate revenue by type data
+  // Generate revenue by type data - usando dados semanais para criar visualização comparativa
   const getRevenueByTypeData = () => {
+    const productRevenue = salesMetrics.productRevenue;
+    const serviceRevenue = salesMetrics.serviceRevenue;
+
+    if (!productRevenue || !serviceRevenue) return [];
+
     return [
       {
         name: 'Produtos',
-        current: salesMetrics.productRevenue?.selectedPeriod || 0,
-        previous: salesMetrics.productRevenue?.previousMonth || 0,
-        goal: salesMetrics.productRevenue?.selectedPeriodGoal || 0,
+        current: productRevenue.selectedPeriod || 0,
+        previous: productRevenue.previousMonth || 0,
+        goal: productRevenue.selectedPeriodGoal || 0,
         comparison: calculateComparison(
-          salesMetrics.productRevenue?.selectedPeriod || 0,
-          salesMetrics.productRevenue?.previousMonth || 0
+          productRevenue.selectedPeriod || 0,
+          productRevenue.previousMonth || 0
         ),
       },
       {
         name: 'Serviços',
-        current: salesMetrics.serviceRevenue?.selectedPeriod || 0,
-        previous: salesMetrics.serviceRevenue?.previousMonth || 0,
-        goal: salesMetrics.serviceRevenue?.selectedPeriodGoal || 0,
+        current: serviceRevenue.selectedPeriod || 0,
+        previous: serviceRevenue.previousMonth || 0,
+        goal: serviceRevenue.selectedPeriodGoal || 0,
         comparison: calculateComparison(
-          salesMetrics.serviceRevenue?.selectedPeriod || 0,
-          salesMetrics.serviceRevenue?.previousMonth || 0
+          serviceRevenue.selectedPeriod || 0,
+          serviceRevenue.previousMonth || 0
         ),
       },
     ];
   };
 
-  // Generate ticket chart data
+  // Função atualizada para usar dados reais do ticket médio semanal
   const getTicketChartData = () => {
-    const chartData = [];
-    const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+    if (!salesMetrics.averageTicket?.weeklyData) return [];
 
-    weeks.forEach((week, index) => {
-      // Simulate some variation in ticket average throughout the month //TODO:
-      const variation = Math.round(Math.random() * 40 - 20); // ±20 variation
-      chartData.push({
-        name: week,
-        current: (salesMetrics.averageTicket?.selectedPeriod || 0) + variation,
-        previous: (salesMetrics.averageTicket?.previousMonth || 0) + variation,
-        goal: salesMetrics.averageTicket?.selectedPeriodGoal || 0,
-      });
-    });
+    const { current, previous, goal } = salesMetrics.averageTicket.weeklyData;
 
-    return chartData;
+    return current.map((currentWeek, index) => ({
+      name: currentWeek.week,
+      current: currentWeek.value,
+      previous: previous[index]?.value || 0,
+      goal: goal[index]?.value || 0,
+    }));
+  };
+
+  // Função para gerar dados semanais de faturamento por tipo (Produtos vs Serviços)
+  const getWeeklyRevenueByTypeData = () => {
+    const productWeekly = salesMetrics.productRevenue?.weeklyData;
+    const serviceWeekly = salesMetrics.serviceRevenue?.weeklyData;
+
+    if (!productWeekly || !serviceWeekly) return [];
+
+    return productWeekly.current.map((productWeek, index) => ({
+      name: productWeek.week,
+      produtos: productWeek.value,
+      servicos: serviceWeekly.current[index]?.value || 0,
+      produtosMeta: productWeekly.goal[index]?.value || 0,
+      servicosMeta: serviceWeekly.goal[index]?.value || 0,
+    }));
   };
 
   // Calculate comparisons
@@ -180,6 +187,7 @@ const SalesOverview = () => {
         />
         <KpiChart
           title="Faturamento por Tipo"
+          subtitle="Produtos vs Serviços no período"
           data={getRevenueByTypeData()}
           type="bar"
           prefix="R$ "
@@ -189,7 +197,8 @@ const SalesOverview = () => {
 
       <div className="grid grid-cols-1 mt-6">
         <KpiChart
-          title="Ticket Médio"
+          title="Ticket Médio Semanal"
+          subtitle="Evolução do ticket médio ao longo das semanas"
           data={getTicketChartData()}
           type="line"
           comparison={ticketComparison}
@@ -209,6 +218,12 @@ const SalesOverview = () => {
             serviceRevenue: salesMetrics.serviceRevenue?.selectedPeriod || 0,
             ticketAverage: salesMetrics.averageTicket?.selectedPeriod || 0,
             goalValue: salesMetrics.totalRevenue?.selectedPeriodGoal || 0,
+            weeklyData: {
+              totalRevenue: salesMetrics.totalRevenue?.weeklyData || null,
+              productRevenue: salesMetrics.productRevenue?.weeklyData || null,
+              serviceRevenue: salesMetrics.serviceRevenue?.weeklyData || null,
+              averageTicket: salesMetrics.averageTicket?.weeklyData || null,
+            },
           },
         }}
       />
