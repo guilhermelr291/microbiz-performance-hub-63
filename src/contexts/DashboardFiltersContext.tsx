@@ -5,6 +5,7 @@ interface DashboardFiltersContextValue {
   selectedPeriod: string;
   setSelectedBranchId: (branch: number) => void;
   setSelectedPeriod: (period: string) => void;
+  getFormattedPeriod: () => string;
 }
 
 const createInitialFilters = () => {
@@ -27,6 +28,15 @@ export const DashboardFiltersProvider: React.FC<{
 }> = ({ children }) => {
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<string>('');
+
+  const getFormattedPeriod = () => {
+    if (!selectedPeriod) return '';
+
+    console.log('selectedPeriod:', selectedPeriod);
+
+    const [year, month] = selectedPeriod.split('-');
+    return `${year}-${month}-01`;
+  };
 
   useEffect(() => {
     const savedFilters = localStorage.getItem('dashboard-filters');
@@ -65,6 +75,7 @@ export const DashboardFiltersProvider: React.FC<{
         selectedPeriod,
         setSelectedBranchId,
         setSelectedPeriod,
+        getFormattedPeriod,
       }}
     >
       {children}

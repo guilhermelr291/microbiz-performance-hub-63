@@ -16,7 +16,7 @@ import { CompanyProvider } from './contexts/CompanyContext';
 import { GoalsProvider } from './contexts/GoalsContext';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import { CompanyBranchProvider } from './contexts/CompanyBranchContext';
-import { SaleMetricsProvider } from './contexts/SalesMetricsContext';
+import { DashboardMetricsProvider } from './contexts/DashboardMetricsContext';
 import { DashboardFiltersProvider } from './contexts/DashboardFiltersContext';
 
 const queryClient = new QueryClient();
@@ -31,7 +31,7 @@ const App = () => (
           <DashboardFiltersProvider>
             <CompanyProvider>
               <CompanyBranchProvider>
-                <SaleMetricsProvider>
+                <DashboardMetricsProvider>
                   <GoalsProvider>
                     <BrowserRouter>
                       <Routes>
@@ -71,7 +71,7 @@ const App = () => (
                       </Routes>
                     </BrowserRouter>
                   </GoalsProvider>
-                </SaleMetricsProvider>
+                </DashboardMetricsProvider>
               </CompanyBranchProvider>
             </CompanyProvider>
           </DashboardFiltersProvider>

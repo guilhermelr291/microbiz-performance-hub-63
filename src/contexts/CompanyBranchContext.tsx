@@ -28,6 +28,8 @@ interface CompanyBranchContextValue {
   clearCompanyBranch: () => void;
   getCompanyBranchesByCompanyId: (companyId: number) => CompanyBranch[];
   fetchCompanyBranches: (companyId: number) => Promise<void>;
+
+  isLoading: boolean;
 }
 
 const CompanyBranchContext = createContext<
@@ -49,6 +51,8 @@ export const CompanyBranchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedCompanyBranchCompanyId, setSelectedCompanyBranchCompanyId] =
     useState<number | null>(null);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   useEffect(() => {
     const savedId = localStorage.getItem('companyBranchId');
     const savedName = localStorage.getItem('companyBranchName');
@@ -62,12 +66,14 @@ export const CompanyBranchProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchCompanyBranches = async (companyId: number) => {
     try {
+      setIsLoading(true);
       const response = await api.get(`/company-branches/${companyId}`);
 
-      console.log('response.data: ', response.data);
       setCompanyBranchesState(response.data);
     } catch (error) {
       console.error('Error fetching company branches:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,6 +125,7 @@ export const CompanyBranchProvider: React.FC<{ children: React.ReactNode }> = ({
       clearCompanyBranch: clearCompanyBranch,
       getCompanyBranchesByCompanyId: getCompanyBranchesByCompanyId,
       fetchCompanyBranches: fetchCompanyBranches,
+      isLoading: isLoading,
     }),
     [
       companyBranches,

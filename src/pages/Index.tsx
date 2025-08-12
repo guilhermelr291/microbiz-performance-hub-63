@@ -124,17 +124,27 @@ const Index = () => {
   const generalData = getGeneralData(dateRange, goals, selectedBranchId);
   const { selectedCompanyId } = useCompany();
 
-  const { fetchCompanyBranches, companyBranches } = useCompanyBranch();
+  const { fetchCompanyBranches, companyBranches, isLoading } =
+    useCompanyBranch();
 
   useEffect(() => {
-    if (selectedCompanyId) {
-      fetchCompanyBranches(selectedCompanyId);
-    }
+    const fetchData = async () => {
+      console.log('fazendo fetch');
+      if (selectedCompanyId) {
+        await fetchCompanyBranches(selectedCompanyId);
+      }
+    };
+
+    fetchData();
+  }, [selectedCompanyId]);
+
+  useEffect(() => {
     if (companyBranches.length > 0) {
       const firstBranch = companyBranches[0];
       if (!selectedBranchId) setSelectedBranchId(firstBranch.id);
     }
-  }, [selectedCompanyId]);
+    console.log('selected branch id: ', selectedBranchId);
+  }, [companyBranches, selectedBranchId, setSelectedBranchId]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);

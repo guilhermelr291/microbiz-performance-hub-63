@@ -1,8 +1,21 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { IndicatorCell } from './IndicatorCell';
+import { getIndicatorStatus } from '@/utils/metricsAnalysis';
+import {
+  Period,
+  SalesData,
+  CustomersData,
+  MarketingData,
+} from '@/types/metrics';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { IndicatorCell } from "./IndicatorCell";
-import { getIndicatorStatus } from "@/utils/metricsAnalysis";
-import { Period, SalesData, CustomersData, MarketingData } from "@/types/metrics";
+import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext';
 
 interface MetricsTableProps {
   salesData: SalesData;
@@ -11,7 +24,13 @@ interface MetricsTableProps {
   period: Period;
 }
 
-export const MetricsTable = ({ salesData, customersData, marketingData, period }: MetricsTableProps) => {
+export const MetricsTable = ({ marketingData, period }: MetricsTableProps) => {
+  const { salesMetrics, customersMetrics } = useDashboardMetrics();
+
+  console.log('salesMetrics', JSON.stringify(salesMetrics, null, 2));
+
+  console.log('customersMetrics', JSON.stringify(customersMetrics, null, 2));
+
   return (
     <div className="space-y-4">
       <Table>
@@ -24,7 +43,9 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
         <TableBody>
           {/* Sales Metrics */}
           <TableRow className="font-medium">
-            <TableCell colSpan={2} className="bg-muted/50">Meta de Vendas</TableCell>
+            <TableCell colSpan={2} className="bg-muted/50">
+              Meta de Vendas
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Faturamento Total</TableCell>
@@ -33,7 +54,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={salesData.totalRevenue}
                 comparison={salesData.revenueComparison}
                 goalValue={salesData.goalValue}
-                status={getIndicatorStatus(salesData.totalRevenue, salesData.revenueComparison, salesData.goalValue)}
+                status={getIndicatorStatus(
+                  salesData.totalRevenue,
+                  salesData.revenueComparison,
+                  salesData.goalValue
+                )}
               />
             </TableCell>
           </TableRow>
@@ -43,7 +68,10 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
               <IndicatorCell
                 value={salesData.productRevenue}
                 comparison={salesData.productComparison || 0}
-                status={getIndicatorStatus(salesData.productRevenue, salesData.productComparison || 0)}
+                status={getIndicatorStatus(
+                  salesData.productRevenue,
+                  salesData.productComparison || 0
+                )}
               />
             </TableCell>
           </TableRow>
@@ -53,7 +81,10 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
               <IndicatorCell
                 value={salesData.serviceRevenue}
                 comparison={salesData.serviceComparison || 0}
-                status={getIndicatorStatus(salesData.serviceRevenue, salesData.serviceComparison || 0)}
+                status={getIndicatorStatus(
+                  salesData.serviceRevenue,
+                  salesData.serviceComparison || 0
+                )}
               />
             </TableCell>
           </TableRow>
@@ -63,14 +94,19 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
               <IndicatorCell
                 value={salesData.ticketAverage || 0}
                 comparison={salesData.ticketComparison || 0}
-                status={getIndicatorStatus(salesData.ticketAverage || 0, salesData.ticketComparison || 0)}
+                status={getIndicatorStatus(
+                  salesData.ticketAverage || 0,
+                  salesData.ticketComparison || 0
+                )}
               />
             </TableCell>
           </TableRow>
 
           {/* Customer Metrics */}
           <TableRow className="font-medium">
-            <TableCell colSpan={2} className="bg-muted/50">Meta de Clientes</TableCell>
+            <TableCell colSpan={2} className="bg-muted/50">
+              Meta de Clientes
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Clientes Atendidos</TableCell>
@@ -79,7 +115,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={customersData.customersServed}
                 comparison={customersData.customersComparison}
                 goalValue={customersData.goalCustomersServed}
-                status={getIndicatorStatus(customersData.customersServed, customersData.customersComparison, customersData.goalCustomersServed)}
+                status={getIndicatorStatus(
+                  customersData.customersServed,
+                  customersData.customersComparison,
+                  customersData.goalCustomersServed
+                )}
               />
             </TableCell>
           </TableRow>
@@ -90,7 +130,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={customersData.newCustomers}
                 comparison={customersData.newCustomersComparison || 0}
                 goalValue={customersData.goalNewCustomers}
-                status={getIndicatorStatus(customersData.newCustomers, customersData.newCustomersComparison || 0, customersData.goalNewCustomers)}
+                status={getIndicatorStatus(
+                  customersData.newCustomers,
+                  customersData.newCustomersComparison || 0,
+                  customersData.goalNewCustomers
+                )}
               />
             </TableCell>
           </TableRow>
@@ -101,7 +145,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={customersData.productsPerClient}
                 comparison={customersData.productsComparison || 0}
                 goalValue={customersData.goalProductsPerClient}
-                status={getIndicatorStatus(customersData.productsPerClient, customersData.productsComparison || 0, customersData.goalProductsPerClient)}
+                status={getIndicatorStatus(
+                  customersData.productsPerClient,
+                  customersData.productsComparison || 0,
+                  customersData.goalProductsPerClient
+                )}
               />
             </TableCell>
           </TableRow>
@@ -112,14 +160,20 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={customersData.servicesPerClient}
                 comparison={customersData.servicesComparison || 0}
                 goalValue={customersData.goalServicesPerClient}
-                status={getIndicatorStatus(customersData.servicesPerClient, customersData.servicesComparison || 0, customersData.goalServicesPerClient)}
+                status={getIndicatorStatus(
+                  customersData.servicesPerClient,
+                  customersData.servicesComparison || 0,
+                  customersData.goalServicesPerClient
+                )}
               />
             </TableCell>
           </TableRow>
 
           {/* Marketing Metrics */}
           <TableRow className="font-medium">
-            <TableCell colSpan={2} className="bg-muted/50">Meta de Marketing</TableCell>
+            <TableCell colSpan={2} className="bg-muted/50">
+              Meta de Marketing
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Investimento em Marketing</TableCell>
@@ -128,7 +182,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.investment}
                 comparison={marketingData.investmentComparison || 0}
                 goalValue={marketingData.goalInvestment}
-                status={getIndicatorStatus(marketingData.investment, marketingData.investmentComparison || 0, marketingData.goalInvestment)}
+                status={getIndicatorStatus(
+                  marketingData.investment,
+                  marketingData.investmentComparison || 0,
+                  marketingData.goalInvestment
+                )}
               />
             </TableCell>
           </TableRow>
@@ -139,7 +197,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.leadsGenerated}
                 comparison={marketingData.leadsGeneratedComparison || 0}
                 goalValue={marketingData.goalLeadsGenerated}
-                status={getIndicatorStatus(marketingData.leadsGenerated, marketingData.leadsGeneratedComparison || 0, marketingData.goalLeadsGenerated)}
+                status={getIndicatorStatus(
+                  marketingData.leadsGenerated,
+                  marketingData.leadsGeneratedComparison || 0,
+                  marketingData.goalLeadsGenerated
+                )}
               />
             </TableCell>
           </TableRow>
@@ -150,7 +212,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.leadsMeetings}
                 comparison={marketingData.leadsMeetingsComparison || 0}
                 goalValue={marketingData.goalLeadsMeetings}
-                status={getIndicatorStatus(marketingData.leadsMeetings, marketingData.leadsMeetingsComparison || 0, marketingData.goalLeadsMeetings)}
+                status={getIndicatorStatus(
+                  marketingData.leadsMeetings,
+                  marketingData.leadsMeetingsComparison || 0,
+                  marketingData.goalLeadsMeetings
+                )}
               />
             </TableCell>
           </TableRow>
@@ -161,7 +227,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.sales}
                 comparison={marketingData.salesComparison || 0}
                 goalValue={marketingData.goalSales}
-                status={getIndicatorStatus(marketingData.sales, marketingData.salesComparison || 0, marketingData.goalSales)}
+                status={getIndicatorStatus(
+                  marketingData.sales,
+                  marketingData.salesComparison || 0,
+                  marketingData.goalSales
+                )}
               />
             </TableCell>
           </TableRow>
@@ -172,7 +242,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.cpl}
                 comparison={marketingData.cplComparison || 0}
                 goalValue={marketingData.goalCpl}
-                status={getIndicatorStatus(marketingData.cpl, marketingData.cplComparison || 0, marketingData.goalCpl)}
+                status={getIndicatorStatus(
+                  marketingData.cpl,
+                  marketingData.cplComparison || 0,
+                  marketingData.goalCpl
+                )}
               />
             </TableCell>
           </TableRow>
@@ -183,7 +257,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.leadToMeetingRate}
                 comparison={marketingData.leadToMeetingRateComparison || 0}
                 goalValue={marketingData.goalLeadToMeetingRate}
-                status={getIndicatorStatus(marketingData.leadToMeetingRate, marketingData.leadToMeetingRateComparison || 0, marketingData.goalLeadToMeetingRate)}
+                status={getIndicatorStatus(
+                  marketingData.leadToMeetingRate,
+                  marketingData.leadToMeetingRateComparison || 0,
+                  marketingData.goalLeadToMeetingRate
+                )}
                 isPercentage={true}
               />
             </TableCell>
@@ -195,7 +273,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.meetingToSaleRate}
                 comparison={marketingData.meetingToSaleRateComparison || 0}
                 goalValue={marketingData.goalMeetingToSaleRate}
-                status={getIndicatorStatus(marketingData.meetingToSaleRate, marketingData.meetingToSaleRateComparison || 0, marketingData.goalMeetingToSaleRate)}
+                status={getIndicatorStatus(
+                  marketingData.meetingToSaleRate,
+                  marketingData.meetingToSaleRateComparison || 0,
+                  marketingData.goalMeetingToSaleRate
+                )}
                 isPercentage={true}
               />
             </TableCell>
@@ -207,7 +289,11 @@ export const MetricsTable = ({ salesData, customersData, marketingData, period }
                 value={marketingData.roas}
                 comparison={marketingData.roasComparison || 0}
                 goalValue={marketingData.goalRoas}
-                status={getIndicatorStatus(marketingData.roas, marketingData.roasComparison || 0, marketingData.goalRoas)}
+                status={getIndicatorStatus(
+                  marketingData.roas,
+                  marketingData.roasComparison || 0,
+                  marketingData.goalRoas
+                )}
               />
             </TableCell>
           </TableRow>

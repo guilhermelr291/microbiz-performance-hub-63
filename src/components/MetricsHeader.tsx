@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { CalendarDays } from 'lucide-react';
 import { DateRange } from '@/types/metrics';
 import { MonthYearPicker } from './DateRangePicker';
 import {
@@ -60,7 +58,6 @@ const MetricsHeader = ({
                 <SelectValue placeholder="Filial" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as filiais</SelectItem>
                 {(availableFiliais ?? []).map(f => (
                   <SelectItem key={f.id} value={String(f.id)}>
                     {f.name || `Filial ${f.id}`}

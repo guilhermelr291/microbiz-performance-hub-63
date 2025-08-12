@@ -72,8 +72,17 @@ export function MonthYearPicker() {
   const displayText = React.useMemo(() => {
     if (!selectedPeriod) return 'Selecione o período';
 
-    const [month, year] = selectedPeriod.split('/');
-    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const [year, month] = selectedPeriod.split('-');
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+
+    if (isNaN(monthNum) || isNaN(yearNum) || monthNum < 1 || monthNum > 12) {
+      return 'Período inválido';
+    }
+
+    const date = new Date(yearNum, monthNum - 1, 1);
+
+    console.log('date: ', date);
     return format(date, "MMMM 'de' yyyy", { locale: ptBR });
   }, [selectedPeriod]);
 
