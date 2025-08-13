@@ -38,6 +38,7 @@ import * as XLSX from 'xlsx';
 import { debounce } from 'lodash';
 import api from '@/services/api';
 import { ptBR } from 'date-fns/locale';
+import { useCompany } from '@/contexts/CompanyContext';
 
 export type SaleStatus = 'COMPLETED' | 'CANCELLED';
 export type SaleType = 'SERVICE' | 'PRODUCT';
@@ -53,7 +54,9 @@ export interface Sale {
   id: number;
   saleDate: string;
   code: string;
-  branch: string;
+  companyBranch: {
+    name: string;
+  };
   description: string;
   quantity: number;
   unitValue: string;
@@ -69,7 +72,6 @@ export interface SalesResponse {
   total: number;
 }
 
-// Componente para seleção de range de datas
 const DateRangePicker = ({
   startDate,
   endDate,
@@ -184,6 +186,7 @@ const SalesList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const { selectedCompanyId } = useCompany();
 
   const PER_PAGE = 50;
 
@@ -228,11 +231,14 @@ const SalesList = () => {
       if (type !== 'todos') params.type = type;
       if (status !== 'todos') params.status = status;
 
-      const response = await api.get('/sales', { params });
+      const response = await api.get(`/sales/${selectedCompanyId}`, { params });
 
       setSales(response.data.sales || []);
       setTotal(response.data.total || 0);
+
+      console.log('response total: ', response.data.total);
     } catch (err: any) {
+      console.error('Error fetching sales: ', err);
       setError(err?.response?.data?.message || 'Erro ao carregar vendas');
       setSales([]);
       setTotal(0);
@@ -241,22 +247,19 @@ const SalesList = () => {
     }
   }, [page, type, status, getEffectiveDateRange, description, customerSearch]);
 
-  // Debounced fetch para filtros de texto
   const debouncedFetchSales = useMemo(
     () =>
       debounce(() => {
-        setPage(1); // Reset para primeira página ao filtrar
+        setPage(1);
         fetchSales();
       }, 500),
     [fetchSales]
   );
 
-  // Fetch imediato para mudanças de página
   useEffect(() => {
     fetchSales();
   }, [page]);
 
-  // Debounced fetch para outros filtros
   useEffect(() => {
     if (page === 1) {
       fetchSales();
@@ -306,14 +309,13 @@ const SalesList = () => {
       return;
     }
 
-    // Para exportação, buscar todas as vendas (sem paginação)
     try {
       setLoading(true);
       const dateRange = getEffectiveDateRange;
       const params: any = {
         startDate: dateRange.start.toISOString().split('T')[0],
         endDate: dateRange.end.toISOString().split('T')[0],
-        export: true, // Flag para indicar exportação completa
+        export: true,
       };
 
       if (description.trim()) params.description = description.trim();
@@ -321,14 +323,13 @@ const SalesList = () => {
       if (type !== 'todos') params.type = type;
       if (status !== 'todos') params.status = status;
 
-      // Substitua por sua chamada de API real para exportação
-      const exportData = await api.get('/sales', { params });
+      const response = await api.get(`/sales/${selectedCompanyId}`, { params });
 
       const ws = XLSX.utils.json_to_sheet(
-        exportData.sales.map(sale => ({
+        response.data.sales.map((sale: any) => ({
           Data: new Date(sale.saleDate).toLocaleDateString('pt-BR'),
           Código: sale.code,
-          Filial: sale.branch,
+          Filial: sale.companyBranch.name,
           Descrição: sale.description,
           Quantidade: sale.quantity,
           'Valor Unit.': currency.format(+sale.unitValue),
@@ -387,7 +388,6 @@ const SalesList = () => {
             </div>
           )}
 
-          {/* Filtros */}
           <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1">Período</label>
@@ -501,7 +501,7 @@ const SalesList = () => {
                         {new Date(sale.saleDate).toLocaleDateString('pt-BR')}
                       </TableCell>
                       <TableCell>{sale.code}</TableCell>
-                      <TableCell>{sale.branch}</TableCell>
+                      <TableCell>{sale.companyBranch.name}</TableCell>
                       <TableCell>{sale.description}</TableCell>
                       <TableCell className="text-right">
                         {sale.quantity}
@@ -547,7 +547,6 @@ const SalesList = () => {
                     />
                   </PaginationItem>
 
-                  {/* Lógica de paginação melhorada */}
                   {(() => {
                     const visiblePages = [];
                     const startPage = Math.max(1, page - 2);
