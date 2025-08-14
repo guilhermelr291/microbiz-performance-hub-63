@@ -8,18 +8,11 @@ import {
 } from '@/components/ui/table';
 import { IndicatorCell } from './IndicatorCell';
 import { getIndicatorStatus } from '@/utils/metricsAnalysis';
-import {
-  Period,
-  SalesData,
-  CustomersData,
-  MarketingData,
-} from '@/types/metrics';
+import { Period, MarketingData } from '@/types/metrics';
 
 import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext';
 
 interface MetricsTableProps {
-  salesData: SalesData;
-  customersData: CustomersData;
   marketingData: MarketingData;
   period: Period;
 }
@@ -28,8 +21,12 @@ export const MetricsTable = ({ marketingData, period }: MetricsTableProps) => {
   const { salesMetrics, customersMetrics } = useDashboardMetrics();
 
   console.log('salesMetrics', JSON.stringify(salesMetrics, null, 2));
-
   console.log('customersMetrics', JSON.stringify(customersMetrics, null, 2));
+
+  const calculateComparison = (current: number, previous: number): number => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
 
   return (
     <div className="space-y-4">
@@ -41,135 +38,208 @@ export const MetricsTable = ({ marketingData, period }: MetricsTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* Sales Metrics */}
           <TableRow className="font-medium">
             <TableCell colSpan={2} className="bg-muted/50">
               Meta de Vendas
             </TableCell>
           </TableRow>
-          <TableRow>
-            <TableCell>Faturamento Total</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={salesData.totalRevenue}
-                comparison={salesData.revenueComparison}
-                goalValue={salesData.goalValue}
-                status={getIndicatorStatus(
-                  salesData.totalRevenue,
-                  salesData.revenueComparison,
-                  salesData.goalValue
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Faturamento Produtos</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={salesData.productRevenue}
-                comparison={salesData.productComparison || 0}
-                status={getIndicatorStatus(
-                  salesData.productRevenue,
-                  salesData.productComparison || 0
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Faturamento Serviços</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={salesData.serviceRevenue}
-                comparison={salesData.serviceComparison || 0}
-                status={getIndicatorStatus(
-                  salesData.serviceRevenue,
-                  salesData.serviceComparison || 0
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Ticket Médio</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={salesData.ticketAverage || 0}
-                comparison={salesData.ticketComparison || 0}
-                status={getIndicatorStatus(
-                  salesData.ticketAverage || 0,
-                  salesData.ticketComparison || 0
-                )}
-              />
-            </TableCell>
-          </TableRow>
 
-          {/* Customer Metrics */}
+          {salesMetrics && (
+            <>
+              <TableRow>
+                <TableCell>Faturamento Total</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={salesMetrics.totalRevenue.selectedPeriod}
+                    comparison={calculateComparison(
+                      salesMetrics.totalRevenue.selectedPeriod,
+                      salesMetrics.totalRevenue.previousMonth
+                    )}
+                    goalValue={salesMetrics.totalRevenue.selectedPeriodGoal}
+                    status={getIndicatorStatus(
+                      salesMetrics.totalRevenue.selectedPeriod,
+                      calculateComparison(
+                        salesMetrics.totalRevenue.selectedPeriod,
+                        salesMetrics.totalRevenue.previousMonth
+                      ),
+                      salesMetrics.totalRevenue.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Faturamento Produtos</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={salesMetrics.productRevenue.selectedPeriod}
+                    comparison={calculateComparison(
+                      salesMetrics.productRevenue.selectedPeriod,
+                      salesMetrics.productRevenue.previousMonth
+                    )}
+                    goalValue={salesMetrics.productRevenue.selectedPeriodGoal}
+                    status={getIndicatorStatus(
+                      salesMetrics.productRevenue.selectedPeriod,
+                      calculateComparison(
+                        salesMetrics.productRevenue.selectedPeriod,
+                        salesMetrics.productRevenue.previousMonth
+                      ),
+                      salesMetrics.productRevenue.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Faturamento Serviços</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={salesMetrics.serviceRevenue.selectedPeriod}
+                    comparison={calculateComparison(
+                      salesMetrics.serviceRevenue.selectedPeriod,
+                      salesMetrics.serviceRevenue.previousMonth
+                    )}
+                    goalValue={salesMetrics.serviceRevenue.selectedPeriodGoal}
+                    status={getIndicatorStatus(
+                      salesMetrics.serviceRevenue.selectedPeriod,
+                      calculateComparison(
+                        salesMetrics.serviceRevenue.selectedPeriod,
+                        salesMetrics.serviceRevenue.previousMonth
+                      ),
+                      salesMetrics.serviceRevenue.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Ticket Médio</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={salesMetrics.averageTicket.selectedPeriod}
+                    comparison={calculateComparison(
+                      salesMetrics.averageTicket.selectedPeriod,
+                      salesMetrics.averageTicket.previousMonth
+                    )}
+                    goalValue={salesMetrics.averageTicket.selectedPeriodGoal}
+                    status={getIndicatorStatus(
+                      salesMetrics.averageTicket.selectedPeriod,
+                      calculateComparison(
+                        salesMetrics.averageTicket.selectedPeriod,
+                        salesMetrics.averageTicket.previousMonth
+                      ),
+                      salesMetrics.averageTicket.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+            </>
+          )}
+
           <TableRow className="font-medium">
             <TableCell colSpan={2} className="bg-muted/50">
               Meta de Clientes
             </TableCell>
           </TableRow>
-          <TableRow>
-            <TableCell>Clientes Atendidos</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={customersData.customersServed}
-                comparison={customersData.customersComparison}
-                goalValue={customersData.goalCustomersServed}
-                status={getIndicatorStatus(
-                  customersData.customersServed,
-                  customersData.customersComparison,
-                  customersData.goalCustomersServed
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Novos Clientes</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={customersData.newCustomers}
-                comparison={customersData.newCustomersComparison || 0}
-                goalValue={customersData.goalNewCustomers}
-                status={getIndicatorStatus(
-                  customersData.newCustomers,
-                  customersData.newCustomersComparison || 0,
-                  customersData.goalNewCustomers
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Produtos por Cliente</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={customersData.productsPerClient}
-                comparison={customersData.productsComparison || 0}
-                goalValue={customersData.goalProductsPerClient}
-                status={getIndicatorStatus(
-                  customersData.productsPerClient,
-                  customersData.productsComparison || 0,
-                  customersData.goalProductsPerClient
-                )}
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Serviços por Cliente</TableCell>
-            <TableCell>
-              <IndicatorCell
-                value={customersData.servicesPerClient}
-                comparison={customersData.servicesComparison || 0}
-                goalValue={customersData.goalServicesPerClient}
-                status={getIndicatorStatus(
-                  customersData.servicesPerClient,
-                  customersData.servicesComparison || 0,
-                  customersData.goalServicesPerClient
-                )}
-              />
-            </TableCell>
-          </TableRow>
 
-          {/* Marketing Metrics */}
+          {customersMetrics && (
+            <>
+              <TableRow>
+                <TableCell>Clientes Atendidos</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={customersMetrics.customersServed.selectedPeriod}
+                    comparison={calculateComparison(
+                      customersMetrics.customersServed.selectedPeriod,
+                      customersMetrics.customersServed.previousMonth
+                    )}
+                    goalValue={
+                      customersMetrics.customersServed.selectedPeriodGoal
+                    }
+                    status={getIndicatorStatus(
+                      customersMetrics.customersServed.selectedPeriod,
+                      calculateComparison(
+                        customersMetrics.customersServed.selectedPeriod,
+                        customersMetrics.customersServed.previousMonth
+                      ),
+                      customersMetrics.customersServed.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Novos Clientes</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={customersMetrics.newCustomers.selectedPeriod}
+                    comparison={calculateComparison(
+                      customersMetrics.newCustomers.selectedPeriod,
+                      customersMetrics.newCustomers.previousMonth
+                    )}
+                    goalValue={customersMetrics.newCustomers.selectedPeriodGoal}
+                    status={getIndicatorStatus(
+                      customersMetrics.newCustomers.selectedPeriod,
+                      calculateComparison(
+                        customersMetrics.newCustomers.selectedPeriod,
+                        customersMetrics.newCustomers.previousMonth
+                      ),
+                      customersMetrics.newCustomers.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Produtos por Cliente</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={customersMetrics.productsPerCustomer.selectedPeriod}
+                    comparison={calculateComparison(
+                      customersMetrics.productsPerCustomer.selectedPeriod,
+                      customersMetrics.productsPerCustomer.previousMonth
+                    )}
+                    goalValue={
+                      customersMetrics.productsPerCustomer.selectedPeriodGoal
+                    }
+                    status={getIndicatorStatus(
+                      customersMetrics.productsPerCustomer.selectedPeriod,
+                      calculateComparison(
+                        customersMetrics.productsPerCustomer.selectedPeriod,
+                        customersMetrics.productsPerCustomer.previousMonth
+                      ),
+                      customersMetrics.productsPerCustomer.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Serviços por Cliente</TableCell>
+                <TableCell>
+                  <IndicatorCell
+                    value={customersMetrics.servicesPerCustomer.selectedPeriod}
+                    comparison={calculateComparison(
+                      customersMetrics.servicesPerCustomer.selectedPeriod,
+                      customersMetrics.servicesPerCustomer.previousMonth
+                    )}
+                    goalValue={
+                      customersMetrics.servicesPerCustomer.selectedPeriodGoal
+                    }
+                    status={getIndicatorStatus(
+                      customersMetrics.servicesPerCustomer.selectedPeriod,
+                      calculateComparison(
+                        customersMetrics.servicesPerCustomer.selectedPeriod,
+                        customersMetrics.servicesPerCustomer.previousMonth
+                      ),
+                      customersMetrics.servicesPerCustomer.selectedPeriodGoal
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+            </>
+          )}
+
           <TableRow className="font-medium">
             <TableCell colSpan={2} className="bg-muted/50">
               Meta de Marketing
@@ -300,7 +370,6 @@ export const MetricsTable = ({ marketingData, period }: MetricsTableProps) => {
         </TableBody>
       </Table>
 
-      {/* Legend */}
       <div className="mt-4 space-y-2 text-sm">
         <h4 className="font-medium">Legenda dos Indicadores:</h4>
         <div className="flex flex-wrap gap-4">
