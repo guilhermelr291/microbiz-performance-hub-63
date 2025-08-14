@@ -12,19 +12,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireLicense = true,
   requireAdmin = false,
 }) => {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { loading } = useAuth();
   const { selectedCompanyId: selectedLicenseId } = useCompany();
   const location = useLocation();
 
-  console.log('isAuthenticated:', isAuthenticated);
-  console.log('user:', user);
-  console.log('loading:', loading);
+  const user = localStorage.getItem('authUser')
+    ? JSON.parse(localStorage.getItem('authUser')!)
+    : null;
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

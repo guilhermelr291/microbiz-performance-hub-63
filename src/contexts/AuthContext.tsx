@@ -37,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('authToken');
@@ -48,21 +49,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     setLoading(true);
-    if (email === DEMO_EMAIL && password === DEMO_PASS) {
-      const demoUser: AuthUser = {
-        id: 'demo-user',
-        email: DEMO_EMAIL,
-        name: 'Demo Admin',
-        roles: ['admin'],
-      };
-      localStorage.setItem('authToken', DEMO_TOKEN);
-      localStorage.setItem('authUser', JSON.stringify(demoUser));
-      localStorage.setItem('demoMode', 'true');
-      setToken(DEMO_TOKEN);
-      setUser(demoUser);
-      setLoading(false);
-      return demoUser;
-    }
 
     const { data } = await api.post('/auth/login', { email, password });
     const receivedToken: string = data?.token;
@@ -76,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('demoMode');
     setToken(receivedToken);
     setUser(receivedUser);
+    setIsAuthenticated(true);
     setLoading(false);
     return receivedUser;
   };
@@ -88,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem('demoMode');
     setUser(null);
     setToken(null);
+    setIsAuthenticated(false);
   };
 
   const hasRole = (role: Role) => !!user?.roles?.includes(role);
