@@ -29,7 +29,9 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+
+  const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
@@ -116,7 +118,7 @@ const DashboardLayout = ({ children, headerTitle }: DashboardLayoutProps) => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium capitalize">
                     {user?.name || user?.email || 'Usuário'}
                   </p>
                   <p className="text-xs text-muted-foreground">Conectado</p>
