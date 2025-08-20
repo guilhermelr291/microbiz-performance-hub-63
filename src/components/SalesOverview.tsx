@@ -10,7 +10,6 @@ const SalesOverview = () => {
   const { salesMetrics, isLoading } = useDashboardMetrics();
   const { selectedPeriod } = useDashboardFilters();
 
-  // Verificar se os dados existem antes de renderizar
   if (isLoading || !salesMetrics || !salesMetrics.totalRevenue) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -42,7 +41,6 @@ const SalesOverview = () => {
     return format(date, "MMMM 'de' yyyy", { locale: ptBR });
   };
 
-  // Função atualizada para usar dados reais do backend
   const generateChartData = () => {
     if (!salesMetrics.totalRevenue?.weeklyData) return [];
 
@@ -56,7 +54,6 @@ const SalesOverview = () => {
     }));
   };
 
-  // Generate revenue by type data - usando dados semanais para criar visualização comparativa
   const getRevenueByTypeData = () => {
     const productRevenue = salesMetrics.productRevenue;
     const serviceRevenue = salesMetrics.serviceRevenue;
@@ -87,7 +84,6 @@ const SalesOverview = () => {
     ];
   };
 
-  // Função atualizada para usar dados reais do ticket médio semanal
   const getTicketChartData = () => {
     if (!salesMetrics.averageTicket?.weeklyData) return [];
 
@@ -101,23 +97,6 @@ const SalesOverview = () => {
     }));
   };
 
-  // Função para gerar dados semanais de faturamento por tipo (Produtos vs Serviços)
-  const getWeeklyRevenueByTypeData = () => {
-    const productWeekly = salesMetrics.productRevenue?.weeklyData;
-    const serviceWeekly = salesMetrics.serviceRevenue?.weeklyData;
-
-    if (!productWeekly || !serviceWeekly) return [];
-
-    return productWeekly.current.map((productWeek, index) => ({
-      name: productWeek.week,
-      produtos: productWeek.value,
-      servicos: serviceWeekly.current[index]?.value || 0,
-      produtosMeta: productWeekly.goal[index]?.value || 0,
-      servicosMeta: serviceWeekly.goal[index]?.value || 0,
-    }));
-  };
-
-  // Calculate comparisons
   const totalRevenueComparison = calculateComparison(
     salesMetrics.totalRevenue?.selectedPeriod || 0,
     salesMetrics.totalRevenue?.previousMonth || 0
@@ -153,6 +132,8 @@ const SalesOverview = () => {
           prefix="R$ "
           goalPercentage={goalPercentage}
           description={getPeriodDescription()}
+          greenFlagPercentage={salesMetrics.greenFlagPercentage}
+          yellowFlagPercentage={salesMetrics.yellowFlagPercentage}
         />
         <ComparisonCard
           title="Faturamento em Produtos"

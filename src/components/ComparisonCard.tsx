@@ -1,4 +1,3 @@
-
 interface ComparisonCardProps {
   title: string;
   value: number;
@@ -7,6 +6,8 @@ interface ComparisonCardProps {
   suffix?: string;
   description?: string;
   goalPercentage?: number;
+  greenFlagPercentage?: number;
+  yellowFlagPercentage?: number;
 }
 
 const ComparisonCard = ({
@@ -16,20 +17,30 @@ const ComparisonCard = ({
   prefix = '',
   suffix = '',
   description,
-  goalPercentage
+  goalPercentage,
+  greenFlagPercentage,
+  yellowFlagPercentage,
 }: ComparisonCardProps) => {
   const getStatusColor = (percentage: number) => {
-    if (percentage >= 100) return 'bg-green-100 dark:bg-green-900/30';
-    if (percentage >= 80) return 'bg-yellow-100 dark:bg-yellow-900/30';
+    if (percentage >= greenFlagPercentage)
+      return 'bg-green-100 dark:bg-green-900/30';
+    if (percentage >= yellowFlagPercentage)
+      return 'bg-yellow-100 dark:bg-yellow-900/30';
     return 'bg-red-100 dark:bg-red-900/30';
   };
 
   return (
-    <div className={`p-6 rounded-lg ${goalPercentage ? getStatusColor(goalPercentage) : ''}`}>
+    <div
+      className={`p-6 rounded-lg ${
+        goalPercentage ? getStatusColor(goalPercentage) : ''
+      }`}
+    >
       <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
       <div className="mt-2 flex items-center justify-between">
         <p className="text-2xl font-bold">
-          {prefix}{value.toLocaleString('pt-BR')}{suffix}
+          {prefix}
+          {value.toLocaleString('pt-BR')}
+          {suffix}
         </p>
         {goalPercentage && (
           <span className="text-sm font-medium">

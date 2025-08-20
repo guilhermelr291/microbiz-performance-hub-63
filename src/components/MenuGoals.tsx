@@ -41,6 +41,9 @@ interface Goals {
   leadToMeetingRate: number;
   meetingToSaleRate: number;
   roas: number;
+  redFlagPercentage: number;
+  yellowFlagPercentage: number;
+  greenFlagPercentage: number;
 }
 
 const GoalInput = ({
@@ -52,7 +55,7 @@ const GoalInput = ({
   readOnly = false,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   onChange?: (value: number) => void;
   prefix?: string;
   suffix?: string;
@@ -66,7 +69,7 @@ const GoalInput = ({
           {prefix && <span className="mr-1">{prefix}</span>}
           <Input
             type="number"
-            value={value}
+            value={value?.toString() ?? ''}
             onChange={
               readOnly
                 ? undefined
@@ -117,6 +120,9 @@ const MenuGoals = () => {
     leadToMeetingRate: 0,
     meetingToSaleRate: 0,
     roas: 0,
+    redFlagPercentage: 30,
+    yellowFlagPercentage: 50,
+    greenFlagPercentage: 80,
   });
   const [loading, setLoading] = useState(false);
 
@@ -196,6 +202,9 @@ const MenuGoals = () => {
             leadToMeetingRate: 0,
             meetingToSaleRate: 0,
             roas: 0,
+            redFlagPercentage: 30,
+            yellowFlagPercentage: 50,
+            greenFlagPercentage: 80,
           };
 
       setGoals(data);
@@ -214,7 +223,7 @@ const MenuGoals = () => {
   const handleGoalChange = (key: keyof Goals, value: number) => {
     const updatedGoals = {
       ...goals,
-      [key]: value,
+      [key]: Number(value),
       companyBranchId: selectedBranch || 0,
       month: selectedMonth,
       year: selectedYear,
@@ -337,6 +346,37 @@ const MenuGoals = () => {
 
           {selectedBranch && !loading && (
             <>
+              <div>
+                <h3 className="text-lg font-semibold mb-4 ">
+                  Percentual de cada bandeira
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <GoalInput
+                    label="🟢 Bandeira Verde"
+                    value={Number(goals.greenFlagPercentage)}
+                    suffix="%"
+                    onChange={value =>
+                      handleGoalChange('greenFlagPercentage', value)
+                    }
+                  />
+                  <GoalInput
+                    label="🟡 Bandeira Amarela"
+                    value={Number(goals.yellowFlagPercentage)}
+                    suffix="%"
+                    onChange={value =>
+                      handleGoalChange('yellowFlagPercentage', value)
+                    }
+                  />
+                  <GoalInput
+                    label="🔴 Bandeira Vermelha"
+                    value={Number(goals.redFlagPercentage)}
+                    suffix="%"
+                    onChange={value =>
+                      handleGoalChange('redFlagPercentage', value)
+                    }
+                  />
+                </div>
+              </div>
               <div>
                 <h3 className="text-lg font-semibold mb-4">Metas de Vendas</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
