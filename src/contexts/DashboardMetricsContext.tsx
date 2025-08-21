@@ -12,6 +12,7 @@ import { useDashboardFilters } from './DashboardFiltersContext';
 export interface DashboardMetrics {
   salesMetrics: any;
   customersMetrics: any;
+  marketingMetrics: any;
   error: string | null;
   fetchMetrics: () => Promise<void>;
   clearMetrics: () => void;
@@ -19,6 +20,7 @@ export interface DashboardMetrics {
 export interface DashboardMetricsContextValue {
   salesMetrics: any;
   customersMetrics: any;
+  marketingMetrics: any;
   isLoading: boolean;
   error: string | null;
   fetchMetrics: () => Promise<void>;
@@ -35,6 +37,7 @@ export const DashboardMetricsProvider: React.FC<{
 }> = ({ children }) => {
   let [salesMetrics, setSalesMetrics] = useState<any>({});
   const [customersMetrics, setCustomersMetrics] = useState<any>({});
+  const [marketingMetrics, setMarketingMetrics] = useState<any>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<DateRange>();
@@ -57,17 +60,25 @@ export const DashboardMetricsProvider: React.FC<{
         queryParams.append('monthAndYear', formattedPeriod);
       }
 
-      const [salesMetricsResponse, customersMetricsResponse] =
-        await Promise.all([
-          api.get(`/sales/metrics?${queryParams.toString()}`),
-          api.get(`/customers/metrics?${queryParams.toString()}`),
-        ]);
+      const [
+        salesMetricsResponse,
+        customersMetricsResponse,
+        marketingMetricsResponse,
+      ] = await Promise.all([
+        api.get(`/sales/metrics?${queryParams.toString()}`),
+        api.get(`/customers/metrics?${queryParams.toString()}`),
+        api.get(
+          `/companies/${selectedBranchId}/marketing-metrics?${queryParams.toString()}`
+        ),
+      ]);
 
       const salesMetrics = salesMetricsResponse.data;
       const customersMetrics = customersMetricsResponse.data;
+      const marketingMetrics = marketingMetricsResponse.data;
 
       setSalesMetrics(salesMetrics);
       setCustomersMetrics(customersMetrics);
+      setMarketingMetrics(marketingMetrics);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Erro desconhecido';
@@ -75,6 +86,7 @@ export const DashboardMetricsProvider: React.FC<{
 
       setSalesMetrics(null);
       setCustomersMetrics(null);
+      setMarketingMetrics(null);
       return;
     } finally {
       setIsLoading(false);
@@ -90,6 +102,7 @@ export const DashboardMetricsProvider: React.FC<{
   const clearMetrics = () => {
     setSalesMetrics(null);
     setCustomersMetrics(null);
+    setMarketingMetrics(null);
     setError(null);
   };
 
@@ -97,6 +110,7 @@ export const DashboardMetricsProvider: React.FC<{
     () => ({
       salesMetrics,
       customersMetrics,
+      marketingMetrics,
       isLoading,
       error,
       fetchMetrics,
@@ -104,7 +118,7 @@ export const DashboardMetricsProvider: React.FC<{
       period: period || null,
       setPeriod: setPeriod || (() => {}),
     }),
-    [salesMetrics, customersMetrics, isLoading, error]
+    [salesMetrics, customersMetrics, marketingMetrics, isLoading, error]
   );
 
   return (
