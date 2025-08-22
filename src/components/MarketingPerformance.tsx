@@ -4,7 +4,7 @@ import { ptBR } from 'date-fns/locale';
 import { DataAnalysis } from '@/components/DataAnalysis';
 
 import { Period, DateRange } from '@/types/metrics';
-import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext'; // 👈 Hook centralizado
+import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext';
 import ComparisonCard from './ComparisonCard';
 import FunnelChart from './FunnelChart';
 import KpiChart from './KpiChart';
@@ -96,23 +96,34 @@ const MarketingPerformance = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <FunnelChart
-          title="Funil de Conversão"
-          subtitle="Do lead à venda"
+          title="Funil de Marketing"
+          subtitle="Investimento até ROAS"
           data={[
+            {
+              name: 'Investimento',
+              current: metrics.totalInvestment.selectedPeriod,
+              previous: metrics.totalInvestment.previousMonth,
+              prefix: 'R$ ',
+              color: '#8B5CF6',
+            },
             {
               name: 'Leads',
               current: metrics.totalLeads.selectedPeriod,
               previous: metrics.totalLeads.previousMonth,
-            },
-            {
-              name: 'Atendimentos',
-              current: metrics.totalLeads.selectedPeriod,
-              previous: metrics.totalLeads.previousMonth,
+              color: '#06B6D4',
             },
             {
               name: 'Vendas',
               current: metrics.totalSales.selectedPeriod,
               previous: metrics.totalSales.previousMonth,
+              color: '#10B981',
+            },
+            {
+              name: 'ROAS',
+              current: metrics.averageRoas.selectedPeriod,
+              previous: metrics.averageRoas.previousMonth,
+              suffix: 'x',
+              color: '#F59E0B',
             },
           ]}
         />

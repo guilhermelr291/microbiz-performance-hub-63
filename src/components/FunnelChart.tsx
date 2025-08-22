@@ -1,109 +1,168 @@
+import React from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResponsiveContainer } from "recharts";
-
-interface FunnelStageProps {
-  label: string;
-  value: number;
-  previousValue?: number;
-  colorClass: string;
-  width: string;
-  conversionRate?: number;
-  goalRate?: number;
+interface FunnelData {
+  name: string;
+  current: number;
+  previous: number;
+  prefix?: string;
+  suffix?: string;
+  color?: string;
 }
-
-const ConversionBadge = ({ rate, previousRate, goalRate }: { rate: number; previousRate: number; goalRate: number }) => {
-  // Use design tokens for consistent theming and contrast
-  let cls = "";
-  if (rate < previousRate && rate < goalRate) {
-    cls = "bg-destructive text-destructive-foreground";
-  } else if (rate > previousRate && rate < goalRate) {
-    cls = "bg-accent text-accent-foreground";
-  } else {
-    cls = "bg-primary text-primary-foreground";
-  }
-  
-  return (
-    <div className={`${cls} rounded-md px-2.5 py-1 text-xs font-medium shadow-sm`}>
-      {rate.toFixed(1)}%
-    </div>
-  );
-};
-
-const FunnelStage = ({ label, value, previousValue, colorClass, width, conversionRate, goalRate }: FunnelStageProps) => (
-  <div className="flex items-center w-full gap-4 animate-fade-in">
-    <div className="relative w-full">
-      <div 
-        style={{ width, clipPath: 'polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%)' }}
-        className={`h-16 md:h-20 flex items-center justify-center rounded-md shadow-lg ring-1 ring-border overflow-hidden ${colorClass}`}
-      >
-        <div className="text-center">
-          <div className="text-sm md:text-base font-medium">{label}</div>
-          <div className="text-lg md:text-xl font-bold">{value}</div>
-          {previousValue !== undefined && (
-            <div className="text-xs md:text-sm opacity-90">Anterior: {previousValue}</div>
-          )}
-        </div>
-      </div>
-    </div>
-    {conversionRate !== undefined && goalRate !== undefined && previousValue !== undefined && (
-      <div className="min-w-[80px] md:min-w-[100px]">
-        <ConversionBadge rate={conversionRate} previousRate={previousValue} goalRate={goalRate} />
-      </div>
-    )}
-  </div>
-);
 
 interface FunnelChartProps {
-  data: Array<{
-    name: string;
-    current: number;
-    previous: number;
-    goalRate?: number;
-  }>;
   title: string;
-  subtitle?: string;
+  subtitle: string;
+  data: FunnelData[];
 }
 
-const FunnelChart = ({ data, title, subtitle }: FunnelChartProps) => {
-  const colorClasses = [
-    "bg-gradient-to-r from-[hsl(var(--info))]/90 to-[hsl(var(--info))] text-[hsl(var(--info-foreground))]",
-    "bg-gradient-to-r from-[hsl(var(--success))]/90 to-[hsl(var(--success))] text-[hsl(var(--success-foreground))]",
-    "bg-gradient-to-r from-[hsl(var(--warning))]/90 to-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))]",
-  ];
-  
-  const getConversionRate = (currentIndex: number) => {
-    if (currentIndex === 0) return undefined;
-    const currentValue = data[currentIndex].current;
-    const previousStageValue = data[currentIndex - 1].current;
-    return (currentValue / previousStageValue) * 100;
+const FunnelChart = ({ title, subtitle, data }: FunnelChartProps) => {
+  const formatValue = (value: number, prefix?: string, suffix?: string) => {
+    const formattedValue = value.toLocaleString('pt-BR');
+    return `${prefix || ''}${formattedValue}${suffix || ''}`;
+  };
+
+  const getPercentageWidth = (
+    value: number,
+    maxValue: number,
+    index: number
+  ) => {
+    const baseWidth = Math.min((value / maxValue) * 100, 100);
+    const funnelReduction = index * 8;
+    return Math.max(baseWidth - funnelReduction, 20);
+  };
+
+  const getComparisonColor = (current: number, previous: number) => {
+    if (current > previous) return 'text-green-600';
+    if (current < previous) return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  const getComparisonIcon = (current: number, previous: number) => {
+    if (current > previous) return '↗';
+    if (current < previous) return '↘';
+    return '→';
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
-          <div className="flex flex-col gap-4">
-            {data.map((item, index) => (
-              <FunnelStage
-                key={item.name}
-                label={item.name}
-                value={item.current}
-                previousValue={item.previous}
-                colorClass={colorClasses[index % colorClasses.length]}
-                width={`${100 - index * 15}%`}
-                conversionRate={getConversionRate(index)}
-                goalRate={item.goalRate}
-              />
-            ))}
+    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500">{subtitle}</p>
+      </div>
+
+      <div className="space-y-4">
+        {data.map((item, index) => {
+          const maxValueForThisMetric = Math.max(item.current, item.previous);
+
+          const currentWidth = getPercentageWidth(
+            item.current,
+            maxValueForThisMetric,
+            index
+          );
+          const previousWidth = getPercentageWidth(
+            item.previous,
+            maxValueForThisMetric,
+            index
+          );
+
+          return (
+            <div key={item.name} className="relative">
+              {/* Label */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">
+                  {item.name}
+                </span>
+                <div className="flex items-center space-x-3 text-sm">
+                  <span className="font-semibold text-gray-900">
+                    {formatValue(item.current, item.prefix, item.suffix)}
+                  </span>
+                  <span
+                    className={`flex items-center space-x-1 ${getComparisonColor(
+                      item.current,
+                      item.previous
+                    )}`}
+                  >
+                    <span>
+                      {getComparisonIcon(item.current, item.previous)}
+                    </span>
+                    <span>
+                      {formatValue(item.previous, item.prefix, item.suffix)}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative mb-3">
+                <div className="relative h-12 mb-1">
+                  <div
+                    className="h-full rounded-lg relative overflow-hidden"
+                    style={{
+                      width: `${currentWidth}%`,
+                      backgroundColor: item.color || '#3B82F6',
+                      margin: `0 ${(100 - currentWidth) / 2}%`,
+                      clipPath:
+                        index === 0
+                          ? 'none'
+                          : `polygon(${8}% 0%, ${92}% 0%, ${88}% 100%, ${12}% 100%)`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-medium text-white">
+                        Atual
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative h-8">
+                  <div
+                    className="h-full rounded-md"
+                    style={{
+                      width: `${previousWidth}%`,
+                      backgroundColor: (item.color || '#3B82F6') + '40',
+                      margin: `0 ${(100 - previousWidth) / 2}%`,
+                      clipPath:
+                        index === 0
+                          ? 'none'
+                          : `polygon(${8}% 0%, ${92}% 0%, ${88}% 100%, ${12}% 100%)`,
+                    }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: item.color || '#3B82F6' }}
+                      >
+                        Anterior
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {index < data.length - 1 && (
+                <div className="flex justify-center">
+                  <div className="w-px h-4 bg-gray-300"></div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-center space-x-6 text-xs text-gray-500">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 rounded bg-blue-500"></div>
+            <span>Período Atual</span>
           </div>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 rounded bg-blue-200"></div>
+            <span>Período Anterior</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
