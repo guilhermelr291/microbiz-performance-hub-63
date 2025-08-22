@@ -37,7 +37,6 @@ const MarketingPerformance = ({
 
   return (
     <>
-      {/* Cards principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <ComparisonCard
           title="Investimento em Marketing"
@@ -65,7 +64,6 @@ const MarketingPerformance = ({
         />
       </div>
 
-      {/* KPIs secundários */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <ComparisonCard
           title="Custo por Lead (CPL)"
@@ -94,7 +92,6 @@ const MarketingPerformance = ({
         />
       </div>
 
-      {/* Funil + Gráfico de Investimento */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <FunnelChart
           title="Funil de Conversão"
@@ -109,7 +106,7 @@ const MarketingPerformance = ({
               name: 'Atendimentos',
               current: metrics.totalLeads.selectedPeriod,
               previous: metrics.totalLeads.previousMonth,
-            }, // Ajustar se tiver métricas de reuniões
+            },
             {
               name: 'Vendas',
               current: metrics.totalSales.selectedPeriod,
@@ -126,19 +123,16 @@ const MarketingPerformance = ({
               current: w.value,
               previous:
                 metrics.totalInvestment.weeklyData.previous[i]?.value || 0,
+              goal: metrics.totalInvestment.weeklyData.goal[i]?.value || 0,
             })
           )}
           type="line"
           prefix="R$ "
-          goalValue={metrics.totalInvestment.weeklyData.goal.reduce(
-            (acc: number, g: any) => acc + g.value,
-            0
-          )}
+          goalValue={metrics.totalInvestment.goal}
         />
       </div>
 
-      {/* Outros KPIs semanais */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <KpiChart
           title="Leads Gerados"
           data={metrics.totalLeads.weeklyData.current.map(
@@ -146,13 +140,11 @@ const MarketingPerformance = ({
               name: w.week,
               current: w.value,
               previous: metrics.totalLeads.weeklyData.previous[i]?.value || 0,
+              goal: metrics.totalLeads.weeklyData.goal[i]?.value || 0,
             })
           )}
           type="line"
-          goalValue={metrics.totalLeads.weeklyData.goal.reduce(
-            (acc: number, g: any) => acc + g.value,
-            0
-          )}
+          goalValue={metrics.totalLeads.goal}
         />
         <KpiChart
           title="Vendas Realizadas"
@@ -161,37 +153,29 @@ const MarketingPerformance = ({
               name: w.week,
               current: w.value,
               previous: metrics.totalSales.weeklyData.previous[i]?.value || 0,
+              goal: metrics.totalSales.weeklyData.goal[i]?.value || 0,
             })
           )}
           type="line"
-          goalValue={metrics.totalSales.weeklyData.goal.reduce(
-            (acc: number, g: any) => acc + g.value,
-            0
-          )}
+          goalValue={metrics.totalSales.goal}
         />
       </div>
 
-      {/* ROAS */}
-      <div className="grid grid-cols-1 mt-6">
-        <KpiChart
-          title="ROAS"
-          data={metrics.averageRoas.weeklyData.current.map(
-            (w: any, i: number) => ({
-              name: w.week,
-              current: w.value,
-              previous: metrics.averageRoas.weeklyData.previous[i]?.value || 0,
-            })
-          )}
-          type="bar"
-          value={metrics.averageRoas.selectedPeriod}
-          goalValue={metrics.averageRoas.weeklyData.goal.reduce(
-            (acc: number, g: any) => acc + g.value,
-            0
-          )}
-        />
-      </div>
+      <KpiChart
+        title="ROAS"
+        data={metrics.averageRoas.weeklyData.current.map(
+          (w: any, i: number) => ({
+            name: w.week,
+            current: w.value,
+            previous: metrics.averageRoas.weeklyData.previous[i]?.value || 0,
+            goal: metrics.averageRoas.weeklyData.goal[i]?.value || 0,
+          })
+        )}
+        type="bar"
+        value={metrics.averageRoas.selectedPeriod}
+        goalValue={metrics.averageRoas.goal}
+      />
 
-      {/* Análise */}
       <DataAnalysis
         title="Análise dos Números - Marketing"
         data={{

@@ -68,7 +68,7 @@ export const DashboardMetricsProvider: React.FC<{
         api.get(`/sales/metrics?${queryParams.toString()}`),
         api.get(`/customers/metrics?${queryParams.toString()}`),
         api.get(
-          `/companies/${selectedBranchId}/marketing-metrics?${queryParams.toString()}`
+          `/companies/${selectedBranchId}/marketing-metrics/average?${queryParams.toString()}`
         ),
       ]);
 
