@@ -166,10 +166,10 @@ const Index = () => {
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="analysis">Análise Estratégica</TabsTrigger>
             <TabsTrigger value="overview">Vendas</TabsTrigger>
             <TabsTrigger value="customers">Clientes</TabsTrigger>
             <TabsTrigger value="marketing">Marketing</TabsTrigger>
-            <TabsTrigger value="analysis">Análise Geral</TabsTrigger>
             <TabsTrigger value="goals">Metas</TabsTrigger>
           </TabsList>
 

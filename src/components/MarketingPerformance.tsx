@@ -39,7 +39,6 @@ const MarketingPerformance = ({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MarketingMetricsModal />
         <ComparisonCard
           title="Investimento em Marketing"
           value={metrics.totalInvestment.selectedPeriod}
@@ -64,6 +63,7 @@ const MarketingPerformance = ({
             metrics.totalSales.selectedPeriod - metrics.totalSales.previousMonth
           }
         />
+        <MarketingMetricsModal />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
