@@ -8,6 +8,7 @@ import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext'; // ðŸ‘
 import ComparisonCard from './ComparisonCard';
 import FunnelChart from './FunnelChart';
 import KpiChart from './KpiChart';
+import MarketingMetricsModal from './MarketingMetricsModal';
 
 interface MarketingPerformanceProps {
   period: Period;
@@ -38,6 +39,7 @@ const MarketingPerformance = ({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MarketingMetricsModal />
         <ComparisonCard
           title="Investimento em Marketing"
           value={metrics.totalInvestment.selectedPeriod}
