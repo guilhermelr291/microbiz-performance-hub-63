@@ -40,6 +40,7 @@ import { Trash2, Edit, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 import { useCompanyBranch } from '@/contexts/CompanyBranchContext';
 import { useDashboardFilters } from '@/contexts/DashboardFiltersContext';
+import { useDashboardMetrics } from '@/contexts/DashboardMetricsContext';
 
 enum MarketingSource {
   META = 'META',
@@ -93,6 +94,8 @@ const MarketingMetricsModal = () => {
   const { selectedBranchId, getFormattedPeriod, selectedPeriod } =
     useDashboardFilters();
 
+  const { fetchMetrics: fetchAllMetrics } = useDashboardMetrics();
+
   const [formData, setFormData] = useState<MarketingMetricForm>({
     date: format(new Date(), 'yyyy-MM-dd'),
     source: MarketingSource.META,
@@ -119,7 +122,6 @@ const MarketingMetricsModal = () => {
         `/companies/${selectedBranchId}/marketing-metrics?${params}`
       );
 
-      console.log('first: ', result.data.data);
       setMetrics(result.data.data || []);
       setTotalPages(result.data.totalPages || 1);
     } catch (error) {
@@ -143,6 +145,7 @@ const MarketingMetricsModal = () => {
       resetForm();
       setIsFormOpen(false);
       await fetchMetrics();
+      await fetchAllMetrics();
     } catch (error) {
       console.error('Erro ao atualizar métrica:', error);
     } finally {
@@ -162,6 +165,7 @@ const MarketingMetricsModal = () => {
       setIsDeleteDialogOpen(false);
       setMetricToDelete(null);
       await fetchMetrics();
+      await fetchAllMetrics();
     } catch (error) {
       console.error('Erro ao excluir métrica:', error);
     } finally {
@@ -183,6 +187,7 @@ const MarketingMetricsModal = () => {
       resetForm();
       setIsFormOpen(false);
       await fetchMetrics();
+      await fetchAllMetrics();
     } catch (error) {
       console.error('Erro ao atualizar métrica:', error);
     } finally {
