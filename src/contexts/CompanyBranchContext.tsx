@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { useCompany } from './CompanyContext';
 
 export interface CompanyBranch {
   id: number;
@@ -52,6 +53,7 @@ export const CompanyBranchProvider: React.FC<{ children: React.ReactNode }> = ({
     useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { selectedCompanyId } = useCompany();
 
   useEffect(() => {
     const savedId = localStorage.getItem('companyBranchId');
@@ -76,6 +78,16 @@ export const CompanyBranchProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedCompanyId) {
+        await fetchCompanyBranches(selectedCompanyId);
+      }
+    };
+
+    fetchData();
+  }, [selectedCompanyId]);
 
   const setCompanyBranches = (list: CompanyBranch[]) => {
     setCompanyBranchesState(list);

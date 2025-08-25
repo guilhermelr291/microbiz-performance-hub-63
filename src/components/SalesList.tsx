@@ -31,14 +31,32 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Pencil, Trash } from 'lucide-react';
 import { format } from 'date-fns';
-// import { ptBR } from 'date-fns/locale'; // Removido pois não está disponível
 import * as XLSX from 'xlsx';
 import { debounce } from 'lodash';
 import api from '@/services/api';
 import { ptBR } from 'date-fns/locale';
 import { useCompany } from '@/contexts/CompanyContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useCompanyBranch } from '@/contexts/CompanyBranchContext';
 
 export type SaleStatus = 'COMPLETED' | 'CANCELLED';
 export type SaleType = 'SERVICE' | 'PRODUCT';
@@ -50,11 +68,17 @@ export interface Customer {
   status: 'ACTIVE' | 'INACTIVE';
 }
 
+export interface Branch {
+  id: number;
+  name: string;
+}
+
 export interface Sale {
   id: number;
   saleDate: string;
   code: string;
   companyBranch: {
+    id: number;
     name: string;
   };
   description: string;
@@ -70,6 +94,18 @@ export interface Sale {
 export interface SalesResponse {
   sales: Sale[];
   total: number;
+}
+
+interface FormDataType {
+  saleDate: Date | null;
+  code: string;
+  companyBranchId: number;
+  description: string;
+  quantity: number;
+  unitValue: number;
+  type: SaleType;
+  status: SaleStatus;
+  customerId: number;
 }
 
 const DateRangePicker = ({
@@ -188,6 +224,25 @@ const SalesList = () => {
   const [page, setPage] = useState(1);
   const { selectedCompanyId } = useCompany();
 
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
+  const [currentSale, setCurrentSale] = useState<Sale | null>(null);
+  const [formData, setFormData] = useState<FormDataType>({
+    saleDate: null,
+    code: '',
+    companyBranchId: 0,
+    description: '',
+    quantity: 0,
+    unitValue: 0,
+    type: 'PRODUCT',
+    status: 'COMPLETED',
+    customerId: 0,
+  });
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const { companyBranches } = useCompanyBranch();
+
   const PER_PAGE = 50;
 
   const getEffectiveDateRange = useMemo(() => {
@@ -245,7 +300,15 @@ const SalesList = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, type, status, getEffectiveDateRange, description, customerSearch]);
+  }, [
+    page,
+    type,
+    status,
+    getEffectiveDateRange,
+    description,
+    customerSearch,
+    selectedCompanyId,
+  ]);
 
   const debouncedFetchSales = useMemo(
     () =>
@@ -257,8 +320,16 @@ const SalesList = () => {
   );
 
   useEffect(() => {
+    if (selectedCompanyId) {
+      api.get(`/customers/${selectedCompanyId}`).then(res => {
+        setCustomers(res.data.data || []);
+      });
+    }
+  }, [selectedCompanyId]);
+
+  useEffect(() => {
     fetchSales();
-  }, [page]);
+  }, [page, fetchSales]);
 
   useEffect(() => {
     if (page === 1) {
@@ -269,7 +340,15 @@ const SalesList = () => {
     return () => {
       debouncedFetchSales.cancel();
     };
-  }, [type, status, getEffectiveDateRange, description, customerSearch]);
+  }, [
+    type,
+    status,
+    getEffectiveDateRange,
+    description,
+    customerSearch,
+    debouncedFetchSales,
+    fetchSales,
+  ]);
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
@@ -353,6 +432,99 @@ const SalesList = () => {
     }
   };
 
+  const handleCreate = () => {
+    setMode('create');
+    setCurrentSale(null);
+    setFormData({
+      saleDate: null,
+      code: '',
+      companyBranchId: 0,
+      description: '',
+      quantity: 0,
+      unitValue: 0,
+      type: 'PRODUCT',
+      status: 'COMPLETED',
+      customerId: 0,
+    });
+    setIsOpen(true);
+  };
+
+  const handleEdit = (sale: Sale) => {
+    setMode('edit');
+    setCurrentSale(sale);
+
+    console.log('sale: ', sale);
+    setFormData({
+      saleDate: new Date(sale.saleDate),
+      code: sale.code,
+      companyBranchId: sale.companyBranch.id,
+      description: sale.description,
+      quantity: sale.quantity,
+      unitValue: parseFloat(sale.unitValue),
+      type: sale.type,
+      status: sale.status,
+      customerId: sale.customer.id,
+    });
+    setIsOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !formData.saleDate ||
+      formData.companyBranchId === 0 ||
+      formData.customerId === 0
+    ) {
+      alert('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      const data = {
+        saleDate: formData.saleDate,
+        code: formData.code,
+        companyBranchId: formData.companyBranchId,
+        description: formData.description,
+        quantity: formData.quantity,
+        unitValue: formData.unitValue.toFixed(2),
+        totalValue: (formData.quantity * formData.unitValue).toFixed(2),
+        type: formData.type,
+        status: formData.status,
+        customerId: formData.customerId,
+      };
+
+      if (mode === 'create') {
+        await api.post('/sales', [data]);
+      } else if (currentSale) {
+        await api.put(`/sales/${currentSale.id}`, data);
+      }
+
+      setIsOpen(false);
+      fetchSales();
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar venda');
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      try {
+        await api.delete(`/sales/${deleteId}`);
+        setIsDeleteOpen(false);
+        fetchSales();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao excluir venda');
+      }
+    }
+  };
+
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 
   return (
@@ -377,6 +549,9 @@ const SalesList = () => {
                 disabled={!sales.length || loading}
               >
                 Exportar Excel
+              </Button>
+              <Button size="sm" onClick={handleCreate} disabled={loading}>
+                Adicionar Venda
               </Button>
             </div>
           </CardTitle>
@@ -482,13 +657,14 @@ const SalesList = () => {
                   <TableHead>CPF/CNPJ</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sales.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={11}
+                      colSpan={12}
                       className="text-center py-8 text-muted-foreground"
                     >
                       {loading ? 'Carregando...' : 'Nenhuma venda encontrada'}
@@ -519,6 +695,22 @@ const SalesList = () => {
                       </TableCell>
                       <TableCell>
                         <StatusPill status={sale.status} />
+                      </TableCell>
+                      <TableCell className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(sale)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(sale.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -606,6 +798,223 @@ const SalesList = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {mode === 'create' ? 'Nova Venda' : 'Editar Venda'}
+            </DialogTitle>
+            <DialogDescription>
+              Preencha os detalhes da venda abaixo.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Data da Venda
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal w-full"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.saleDate
+                        ? format(formData.saleDate, 'dd/MM/yyyy')
+                        : 'Selecione a data'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.saleDate || undefined}
+                      onSelect={date =>
+                        setFormData({ ...formData, saleDate: date || null })
+                      }
+                      initialFocus
+                      locale={ptBR}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Código</label>
+                <Input
+                  value={formData.code}
+                  onChange={e =>
+                    setFormData({ ...formData, code: e.target.value })
+                  }
+                  placeholder="Digite o código"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Filial</label>
+                <Select
+                  value={
+                    formData.companyBranchId
+                      ? formData.companyBranchId.toString()
+                      : ''
+                  }
+                  onValueChange={v =>
+                    setFormData({ ...formData, companyBranchId: parseInt(v) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a filial" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companyBranches.map(branch => (
+                      <SelectItem key={branch.id} value={branch.id.toString()}>
+                        {branch.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Descrição
+                </label>
+                <Input
+                  value={formData.description}
+                  onChange={e =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Digite a descrição"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Quantidade
+                </label>
+                <Input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      quantity: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="Digite a quantidade"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Valor Unitário
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.unitValue}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      unitValue: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  placeholder="Digite o valor unitário"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Valor Total
+                </label>
+                <p className="text-sm">
+                  {currency.format(formData.quantity * formData.unitValue)}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <Select
+                  value={formData.type}
+                  onValueChange={v =>
+                    setFormData({ ...formData, type: v as SaleType })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PRODUCT">Produto</SelectItem>
+                    <SelectItem value="SERVICE">Serviço</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <Select
+                  value={formData.status}
+                  onValueChange={v =>
+                    setFormData({ ...formData, status: v as SaleStatus })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="COMPLETED">Concluída</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Cliente
+                </label>
+                <Select
+                  value={
+                    formData.customerId ? formData.customerId.toString() : ''
+                  }
+                  onValueChange={v =>
+                    setFormData({ ...formData, customerId: parseInt(v) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map(customer => (
+                      <SelectItem
+                        key={customer.id}
+                        value={customer.id.toString()}
+                      >
+                        {customer.name} ({customer.taxId})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">
+                {mode === 'create' ? 'Criar' : 'Salvar'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta venda? Essa ação não pode ser
+              desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };

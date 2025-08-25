@@ -128,17 +128,6 @@ const Index = () => {
     useCompanyBranch();
 
   useEffect(() => {
-    const fetchData = async () => {
-      console.log('fazendo fetch');
-      if (selectedCompanyId) {
-        await fetchCompanyBranches(selectedCompanyId);
-      }
-    };
-
-    fetchData();
-  }, [selectedCompanyId]);
-
-  useEffect(() => {
     if (companyBranches.length > 0) {
       const firstBranch = companyBranches[0];
       if (!selectedBranchId) setSelectedBranchId(firstBranch.id);

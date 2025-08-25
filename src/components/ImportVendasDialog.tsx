@@ -298,6 +298,7 @@ export const ImportVendasDialog = () => {
         loadImportedSpreadsheets();
       }
     } catch (error: any) {
+      console.error('Erro ao enviar dados para o backend:', error);
       alert(error.message || 'Erro inesperado');
     }
   };
