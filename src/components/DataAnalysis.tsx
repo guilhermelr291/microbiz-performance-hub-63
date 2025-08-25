@@ -227,13 +227,13 @@ export function DataAnalysis({ title, data }: DataAnalysisProps) {
     }
 
     // Analyze lead to meeting conversion
-    if (leadToMeetingRate > 60) {
-      analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está acima da média do mercado, indicando qualificação eficiente dos leads.\n\n`;
-    } else if (leadToMeetingRate < 40) {
-      analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está abaixo do ideal, sugerindo necessidade de melhor qualificação dos leads.\n\n`;
-    } else {
-      analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está dentro do esperado.\n\n`;
-    }
+    // if (leadToMeetingRate > 60) {
+    //   analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está acima da média do mercado, indicando qualificação eficiente dos leads.\n\n`;
+    // } else if (leadToMeetingRate < 40) {
+    //   analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está abaixo do ideal, sugerindo necessidade de melhor qualificação dos leads.\n\n`;
+    // } else {
+    //   analysis += `📞 Conversão Lead → Atendimento:\nTaxa de ${leadToMeetingRate}% está dentro do esperado.\n\n`;
+    // }
 
     if (goalLeadToMeetingRate) {
       if (leadToMeetingRate >= goalLeadToMeetingRate) {

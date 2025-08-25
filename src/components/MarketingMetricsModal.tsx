@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   Dialog,
@@ -324,10 +324,15 @@ const MarketingMetricsModal = () => {
                       return (
                         <TableRow key={metric.id}>
                           <TableCell>
-                            {format(new Date(metric.date), 'dd/MM/yyyy', {
-                              locale: ptBR,
-                            })}
+                            {format(
+                              parseISO(metric.date.split('T')[0]),
+                              'dd/MM/yyyy',
+                              {
+                                locale: ptBR,
+                              }
+                            )}
                           </TableCell>
+
                           <TableCell>
                             <span
                               className={`px-2 py-1 rounded text-xs font-medium ${
